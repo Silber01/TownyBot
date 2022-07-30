@@ -2,3 +2,4 @@
 venv
 non-code/key.txt
 players/*
+nohup.out

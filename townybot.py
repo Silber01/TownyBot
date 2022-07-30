@@ -4,11 +4,9 @@ from os.path import exists
 import discord  # provides some additional discord features, such as embedded messages
 from discord.ext import commands  # provides the bulk of discord bot abilities
 
-
 from tbLib.help import helpHandler, commandsHandler
 from tbLib.nameGenerator import generateName
-from tbLib.stats import statsHandler
-
+from tbLib.stats import statsHandler, balanceHandler, levelsHandler
 
 client = commands.Bot(command_prefix='-', help_command=None)  # sets prefix and deletes default help command
 
@@ -46,15 +44,16 @@ async def commands(ctx):
 
 # --------- Stats ---------------
 @client.command()
-async def stats(ctx, name = "NONE"):
+async def stats(ctx, name="NONE"):
     await statsHandler(ctx, name)
 
 @client.command()
-async def wtfmez(ctx, name):
-    print(name)
+async def balance(ctx, name="NONE"):
+    await balanceHandler(ctx, name)
 
-
-
+@client.command()
+async def levels(ctx, name="NONE"):
+    await levelsHandler(ctx, name)
 
 
 with open("non-code/key.txt", "r") as readFile:

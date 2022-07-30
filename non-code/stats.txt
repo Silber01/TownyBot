@@ -1,4 +1,4 @@
-__Stats for USERNAME:__
+**__Stats for USERNAME:__**
 
 **Balance**: BALANCE
 **Town**: TOWN

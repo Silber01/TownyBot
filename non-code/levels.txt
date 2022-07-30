@@ -1,0 +1,16 @@
+**__Levels for USERNAME__**
+**Mining:**
+**Level:** MINELVL
+**XP:** MINEXP/FISHREQXP
+
+**Woodcutting:**
+**Level:** WOODLVL
+**XP:** WOODXP/WOODREQXP
+
+**Farming:**
+**Level:** FARMLVL
+**XP:** FARMXP/FARMREQXP
+
+**Fishing:**
+**Level:** FISHLVL
+**XP:** FISHXP/FISHREQXP
