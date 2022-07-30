@@ -1,5 +1,6 @@
 {
   "NAME": "null",
+  "DISCRIMINATOR": "null",
   "BALANCE": 0,
   "MINEXP": 0,
   "MINELVL": 1,

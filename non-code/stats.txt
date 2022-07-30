@@ -1,0 +1,9 @@
+__Stats for USERNAME:__
+
+**Balance**: BALANCE
+**Town**: TOWN
+
+**Mining Level**: MINELVL
+**Woodcutting Level**: WOODLVL
+**Farming Level**: FARMINGLVL
+**Fishing Level**: FISHINGLVL
