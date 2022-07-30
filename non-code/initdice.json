@@ -1,0 +1,10 @@
+{
+  "SENDER": 0,
+  "RECEIVER": 0,
+  "DICESIZE": 0,
+  "DICES": 0,
+  "WINMETHOD": "NONE",
+  "AMOUNT": 0,
+  "CHANNEL": 0,
+  "TTL": 0
+}

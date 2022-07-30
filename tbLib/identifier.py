@@ -6,7 +6,7 @@ import json
 # Returns the user ID if user is found, or an error with explanation if user is not found
 # Made by Daniel Slade, 2022
 
-userDir = "players" # Directory for
+userDir = "players"  # Directory for
 
 
 def identify(name: str):
@@ -50,3 +50,8 @@ def identify(name: str):
             errorMsg += "\n\nPlease use their full username with the 4-digit code, or mention them instead of putting their name."
             return errorMsg
 
+
+def getFullName(id):
+    with open(f"players/{id}.json", "r") as read_file:
+        playerData = json.load(read_file)
+    return playerData["NAME"] + "#" + playerData["DISCRIMINATOR"]

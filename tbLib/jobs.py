@@ -10,33 +10,39 @@ waitTime = 10
 
 
 def calculateMoney(level, plots):
-    baseMoney = (10 + ceil(level ** 1.35)) * (1.2 ** plots)
+    baseMoney = (20 + ceil(level ** 1.35)) * (1.2 ** plots)
     modifier = random.randint(85, 115) / 100
     return int(baseMoney * modifier)
 
+
 def calculateXP(plots):
-    baseXP = 5 * (1.5 ** plots)
+    baseXP = 10 * (1.5 ** plots)
     modifier = random.randint(85, 115) / 100
     return int(baseXP * modifier)
+
 
 def calculateNextLevel(level):
     return int(100 * level ** 1.2)
 
 
 async def mineHandler(ctx):
-    await jobHandler(ctx, "LASTMINE", "MINELVL", "MINES", "MINEXP", "You mined.")
+    await jobHandler(ctx, "LASTMINE", "MINELVL", "MINES", "MINEXP", "You mined.", discord.Color.teal())
+
 
 async def chopHandler(ctx):
-    await jobHandler(ctx, "LASTCHOP", "WOODLVL", "FORESTS", "WOODXP", "You cut some wood.")
+    await jobHandler(ctx, "LASTCHOP", "WOODLVL", "FORESTS", "WOODXP", "You cut some wood.", discord.Color.purple())
+
 
 async def harvestHandler(ctx):
-    await jobHandler(ctx, "LASTHARVEST", "FARMLVL", "FARMS", "FARMXP", "You harvested some crops.")
+    await jobHandler(ctx, "LASTHARVEST", "FARMLVL", "FARMS", "FARMXP", "You harvested some crops.",
+                     discord.Color.gold())
+
 
 async def catchHandler(ctx):
-    await jobHandler(ctx, "LASTCATCH", "FISHLVL", "PONDS", "FISHXP", "You caught a fish.")
+    await jobHandler(ctx, "LASTCATCH", "FISHLVL", "PONDS", "FISHXP", "You caught a fish.", discord.Color.blue())
 
 
-async def jobHandler(ctx, timeToUse, level, plotName, xp, flavorText):
+async def jobHandler(ctx, timeToUse, level, plotName, xp, flavorText, sidebarColor):
     embed = makeEmbed()
     userID = ctx.author.id
     with open(f"players/{userID}.json", "r") as read_file:
@@ -60,7 +66,7 @@ async def jobHandler(ctx, timeToUse, level, plotName, xp, flavorText):
             embed.description += f"\n\n**LEVEL UP!!** You are now level" + str(userData[level]) + "."
         embed.description += "\n\nProgress: " + str(userData[xp]) + "/" + str(
             calculateNextLevel(userData[level]))
-        embed.color = discord.Color.teal()
+        embed.color = sidebarColor
         await ctx.send(embed=embed)
         userData[timeToUse] = currentTime
         with open(f"players/{userID}.json", "w") as write_file:

@@ -1,5 +1,6 @@
 .idea
 venv
 non-code/key.txt
+dicereqs/*
 players/*
 nohup.out

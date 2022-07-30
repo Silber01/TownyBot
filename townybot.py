@@ -3,11 +3,13 @@ import os
 from os.path import exists
 import discord  # provides some additional discord features, such as embedded messages
 from discord.ext import commands  # provides the bulk of discord bot abilities
+import asyncio
 
 from tbLib.help import helpHandler, commandsHandler
 from tbLib.nameGenerator import generateName
 from tbLib.stats import statsHandler, balanceHandler, levelsHandler
 from tbLib.jobs import mineHandler, chopHandler, harvestHandler, catchHandler
+from tbLib.dicing import diceHandler, deqDiceTTLs
 
 client = commands.Bot(command_prefix='-', help_command=None)  # sets prefix and deletes default help command
 
@@ -17,6 +19,9 @@ botTitle = "TownyBot"
 @client.event
 async def on_ready():
     print("I'm ready!")
+    while True:
+        await asyncio.sleep(5)
+        await deqDiceTTLs(client, 5)
 
 
 @client.before_invoke
@@ -74,6 +79,16 @@ async def harvest(ctx):
 async def catch(ctx):
     await catchHandler(ctx)
 
+# -------- Jobs ---------------
+
+
+# -------- Dicing ---------------
+@client.command()
+async def dice(ctx, *args):
+    if len(args) < 5:
+        await ctx.send("Invalid arguments! Syntax is `-dice <player> <dice size> <dices thrown> <win method (high, low, wins, total)>, <bet>`")
+    else:
+        await diceHandler(ctx, args[0], args[1], args[2], args[3], args[4])
 
 with open("non-code/key.txt", "r") as readFile:
     token = readFile.read()
