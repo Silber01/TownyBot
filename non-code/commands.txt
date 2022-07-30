@@ -1,0 +1,32 @@
+**__Command List__**
+
+**Help**
+`-help`: Explains general concept of the bot
+`-commands`: Gives list of commands.
+
+**Stats**
+`-stats <player>`: Shows full stats, including balance, job levels, and town plot information of player. If player not specified, shows your stats.
+`-bal <player>`: Shows balance of player. If player not specified, shows your balance..
+`-levels <player>`: Shows job levels of player. If player not specified, shows your levels.
+`-town info <player>`: Shows town plot information of player. If player not specified, shows your town information.
+`-baltop <page>`: Shows top players by balance.
+
+**Jobs**
+`-mine`: Mines, giving money and miner XP.
+`-chop`: Chops wood, giving money and woodcutter XP.
+`-harvest`: Farms crops, giving money and farmer XP.
+`-catch`: Catches fish, giving money and fisherman XP.
+
+**Town**
+`-town info <player>`: Shows town plot information of player. If player not specified, shows your town information.
+`-town prices`: Shows prices for new plots and structures
+`-town rename <newName>`: Renames your town.
+`-town buy <amount>`: Buys amount of plots specified, if town can hold it. If amount not specified, buys one plot.
+`-town build <structure> <amount>`: Builds given structure for amount of plots specified, if enough empty plots are available. If amount not specified, builds one structure.
+`-town destroy <structure> <amount>`: Destroys given structures, converting them into empty plots. If amount not specified, destroys one structure.
+`-town abandonplot <amount>`: Abandons amount of plots specified. If amount not specified, abandons one plot.
+
+**Gambling**
+`-dice <player> <dice size> <dice rolls> <win condition> <amount>`: Challenges given player to a dice roll with given dice size, amount of rolls, and win condition for given amount, if both players can afford it.
+`-dice accept`: Accepts current dice challenge.
+`-dice deny`: Refuses current dice challenge.

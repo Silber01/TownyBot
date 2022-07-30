@@ -1,0 +1,13 @@
+**Abstract**
+TownyBot is a Discord Bot that works as a town-based economy . Players can work jobs, live in towns, build plots, buy towns, gamble, and make money.
+
+**Jobs**
+There are Four main jobs: Mining, Woodcutting, Farming, and Fishing. Players can do a specific  job once every 15 seconds (as in once you mine, for example, you cannot mine again for 15 seconds, but you can still do other jobs), and gain money and XP for doing so. When players level up, they will make more money every time they do that job. Players can also make more money by doing a job by owning plots with structures dedicated to that job. More information in "Towns."
+
+**Towns**
+Players own a town, and buy plots for money. However, they are taxed a fixed amount for every plot that they own. The purpose of plots is to build structures to make more money with jobs. The structures that players can build are mines, forests, farms, and ponds, which will make more money for mining, woodcutting, farming, and fishing respectively. A plot can only hold one structure, but players can have multiple plots that have the same type of structure.
+
+**Gambling**
+Players are able to gamble with each other by dicing. One player invites another to play a dice by sending them an invitation with the size of the dice, the amount of dice,  the way the winner is determined (low, high, total), and how much money each player puts in. The player invited can either accept or deny the dice. If they accept it, the dice are thrown and the winner is announced. The winner gets their money back along with the money of the opponent.
+
+**To see commands list, do `-commands`!**
