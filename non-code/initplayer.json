@@ -15,5 +15,9 @@
   "MINES": 0,
   "FORESTS": 0,
   "FARMS": 0,
-  "PONDS": 0
+  "PONDS": 0,
+  "LASTMINE": 0,
+  "LASTCHOP": 0,
+  "LASTHARVEST": 0,
+  "LASTCATCH": 0
 }

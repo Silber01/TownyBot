@@ -7,6 +7,7 @@ from discord.ext import commands  # provides the bulk of discord bot abilities
 from tbLib.help import helpHandler, commandsHandler
 from tbLib.nameGenerator import generateName
 from tbLib.stats import statsHandler, balanceHandler, levelsHandler
+from tbLib.jobs import mineHandler, chopHandler, harvestHandler, catchHandler
 
 client = commands.Bot(command_prefix='-', help_command=None)  # sets prefix and deletes default help command
 
@@ -54,6 +55,24 @@ async def balance(ctx, name="NONE"):
 @client.command()
 async def levels(ctx, name="NONE"):
     await levelsHandler(ctx, name)
+
+
+# -------- Jobs ---------------
+@client.command()
+async def mine(ctx):
+    await mineHandler(ctx)
+
+@client.command()
+async def chop(ctx):
+    await chopHandler(ctx)
+
+@client.command()
+async def harvest(ctx):
+    await harvestHandler(ctx)
+
+@client.command()
+async def catch(ctx):
+    await catchHandler(ctx)
 
 
 with open("non-code/key.txt", "r") as readFile:

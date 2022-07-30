@@ -1,6 +1,6 @@
 **__Stats for USERNAME:__**
 
-**Balance**: BALANCE
+**Balance**: $BALANCE
 **Town**: TOWN
 
 **Mining Level**: MINELVL

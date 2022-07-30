@@ -2,6 +2,7 @@ import discord
 import json
 from tbLib.identifier import identify
 from tbLib.makeEmbed import makeEmbed
+from tbLib.jobs import calculateNextLevel
 
 
 async def identifyAndHandleError(ctx, name):
@@ -47,7 +48,7 @@ async def balanceHandler(ctx, name):
         userData = json.load(read_file)
     username = userData["NAME"]
     balance = userData["BALANCE"]
-    embed.description = f"**{username}'s balance**: {balance}"
+    embed.description = f"**{username}'s balance**: ${balance}"
     await ctx.send(embed=embed)
 
 async def levelsHandler(ctx, name):
@@ -68,6 +69,10 @@ async def levelsHandler(ctx, name):
     levelsMsg = levelsMsg.replace("FARMXP", str(userData["FARMXP"]))
     levelsMsg = levelsMsg.replace("FISHLVL", str(userData["FISHLVL"]))
     levelsMsg = levelsMsg.replace("FISHXP", str(userData["FISHXP"]))
+    levelsMsg = levelsMsg.replace("MINEREQXP", str(calculateNextLevel(userData["MINELVL"])))
+    levelsMsg = levelsMsg.replace("WOODREQXP", str(calculateNextLevel(userData["WOODLVL"])))
+    levelsMsg = levelsMsg.replace("FARMREQXP", str(calculateNextLevel(userData["FARMLVL"])))
+    levelsMsg = levelsMsg.replace("FISHREQXP", str(calculateNextLevel(userData["FISHLVL"])))
     embed.description = levelsMsg
     await ctx.send(embed=embed)
 
