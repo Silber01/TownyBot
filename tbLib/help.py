@@ -1,9 +1,9 @@
 import discord
 
-
 from tbLib.makeEmbed import makeEmbed
 
 
+# prints help.txt
 async def helpHandler(ctx):
     with open("non-code/help.txt", "r") as read_file:
         helpText = read_file.read()
@@ -13,6 +13,7 @@ async def helpHandler(ctx):
     await ctx.send(embed=embed)
 
 
+# prints commands.txt
 async def commandsHandler(ctx):
     with open("non-code/commands.txt", "r") as read_file:
         commandsText = read_file.read()

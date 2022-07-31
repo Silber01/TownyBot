@@ -25,7 +25,7 @@ animals = ['Aardvark', 'Albatross', 'Alligator', 'Alpaca', 'Ant', 'Anteater', 'A
 
 suffixes = ["Ville", " Town", " City", "opolis", "opia", "ton", "burn", "sey", "pool", "orn"]
 
-
+# makes a random town name by combining an animal name with a suffix
 def generateName():
     animalName = animals[randrange(0, len(animals))]
     suffix = suffixes[randrange(0, len(suffixes))]
