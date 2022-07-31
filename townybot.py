@@ -9,7 +9,7 @@ from tbLib.help import helpHandler, commandsHandler
 from tbLib.nameGenerator import generateName
 from tbLib.stats import statsHandler, balanceHandler, levelsHandler
 from tbLib.jobs import mineHandler, chopHandler, harvestHandler, catchHandler
-from tbLib.dicing import diceHandler, deqDiceTTLs
+from tbLib.dicing import diceHandler, deqDiceTTLs, denyHandler, cancelHandler, acceptHandler
 
 client = commands.Bot(command_prefix='-', help_command=None)  # sets prefix and deletes default help command
 
@@ -53,8 +53,13 @@ async def commands(ctx):
 async def stats(ctx, name="NONE"):
     await statsHandler(ctx, name)
 
+
 @client.command()
 async def balance(ctx, name="NONE"):
+    await balanceHandler(ctx, name)
+
+@client.command()
+async def bal(ctx, name="NONE"):
     await balanceHandler(ctx, name)
 
 @client.command()
@@ -67,17 +72,21 @@ async def levels(ctx, name="NONE"):
 async def mine(ctx):
     await mineHandler(ctx)
 
+
 @client.command()
 async def chop(ctx):
     await chopHandler(ctx)
+
 
 @client.command()
 async def harvest(ctx):
     await harvestHandler(ctx)
 
+
 @client.command()
 async def catch(ctx):
     await catchHandler(ctx)
+
 
 # -------- Jobs ---------------
 
@@ -85,10 +94,22 @@ async def catch(ctx):
 # -------- Dicing ---------------
 @client.command()
 async def dice(ctx, *args):
+    if len(args) == 1:
+        if args[0].lower() == "deny":
+            await denyHandler(ctx)
+            return
+        elif args[0].lower() == "cancel":
+            await cancelHandler(ctx)
+            return
+        elif args[0].lower() == "accept":
+            await acceptHandler(ctx)
+            return
     if len(args) < 5:
-        await ctx.send("Invalid arguments! Syntax is `-dice <player> <dice size> <dices thrown> <win method (high, low, wins, total)>, <bet>`")
+        await ctx.send(
+            "Invalid arguments! Syntax is `-dice <player> <dice size> <dices thrown> <win method (high, low, wins, total)>, <bet>`")
     else:
         await diceHandler(ctx, args[0], args[1], args[2], args[3], args[4])
+
 
 with open("non-code/key.txt", "r") as readFile:
     token = readFile.read()

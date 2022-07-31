@@ -1,9 +1,13 @@
+import random
+
 import discord
 import os
 import json
+import asyncio
 
 from tbLib.identifier import identify, getFullName
 from tbLib.makeEmbed import makeEmbed
+
 
 
 async def deqDiceTTLs(client, seconds):
@@ -121,6 +125,165 @@ async def diceHandler(ctx, receiver, dicesize, dices, winmethod, amount):
     embed.set_footer(text="This request expires in " + str(int(ttl / 60)) + " minutes, " + str(ttl % 60) + " seconds.")
     embed.color = discord.Color.green()
     await ctx.send(embed=embed)
+
+
+async def denyHandler(ctx):
+    receiverID = str(ctx.author.id)
+    diceToCancel = None
+    for dice in os.listdir("dicereqs"):
+        with open(f"dicereqs/{dice}", "r") as read_file:
+            if json.load(read_file)["RECEIVER"] == receiverID:
+                diceToCancel = dice
+                break
+    embed = makeEmbed()
+    if diceToCancel is None:
+        embed.description = "You are not in a dice game!"
+        embed.color = discord.Color.red()
+        await ctx.send(embed=embed)
+        return
+    embed.description = f"{getFullName(receiverID)} cancelled the game."
+    embed.color = discord.Color.red()
+    os.remove(f"dicereqs/{diceToCancel}")
+    await ctx.send(embed=embed)
+
+async def cancelHandler(ctx):
+    senderID = str(ctx.author.id)
+    embed = makeEmbed()
+    if senderID + ".json" in os.listdir("dicereqs"):
+        embed.description = f"{getFullName(senderID)} has cancelled the game."
+        embed.color = discord.Color.red()
+        os.remove(f"dicereqs/{senderID}.json")
+        await ctx.send(embed=embed)
+    else:
+        embed.description = "You are not in a dice game!"
+        embed.color = discord.Color.red()
+        await ctx.send(embed=embed)
+
+async def acceptHandler(ctx):
+    receiverID = str(ctx.author.id)
+    diceGame = None
+    for dice in os.listdir("dicereqs"):
+        with open(f"dicereqs/{dice}", "r") as read_file:
+            if json.load(read_file)["RECEIVER"] == receiverID:
+                diceGame = dice
+                break
+    if diceGame is None:
+        embed = makeEmbed()
+        embed.description = "You are not in a dice game!"
+        embed.color = discord.Color.red()
+        await ctx.send(embed=embed)
+        return
+    with open(f"dicereqs/{diceGame}", "r") as read_file:
+        diceData = json.load(read_file)
+    senderID = diceData["SENDER"]
+    senderName = getFullName(diceData["SENDER"])
+    receiverName = getFullName(diceData["RECEIVER"])
+    senderDice = []
+    receiverDice = []
+    dices = diceData["DICES"]
+    diceSize = diceData["DICESIZE"]
+    with open(f"players/{receiverID}.json", "r") as read_file:
+        receiverData = json.load(read_file)
+    with open(f"players/{senderID}.json", "r") as read_file:
+        senderData = json.load(read_file)
+    if receiverData["BALANCE"] < diceData["AMOUNT"]:
+        embed = makeEmbed()
+        embed.description = f"{getFullName(receiverID)} does not have enough money!"
+        embed.color = discord.Color.red()
+        await ctx.send(embed=embed)
+        return
+    if senderData["BALANCE"] < diceData["AMOUNT"]:
+        embed = makeEmbed()
+        embed.description = f"{getFullName(senderID)} does not have enough money!"
+        embed.color = discord.Color.red()
+        await ctx.send(embed=embed)
+        return
+    senderData["BALANCE"] -= diceData["AMOUNT"]
+    receiverData["BALANCE"] -= diceData["AMOUNT"]
+    with open(f"players/{receiverID}.json", "w") as write_file:
+        json.dump(receiverData, write_file)
+    with open(f"players/{senderID}.json", "w") as write_file:
+        json.dump(senderData, write_file)
+
+    for i in range(dices):
+        senderRoll = random.randint(0, diceSize)
+        receiverRoll = random.randint(0, diceSize)
+        embed = makeEmbed()
+        embed.description = f"""**{senderName}** rolled a {senderRoll} on a {diceSize} sided dice.\n
+                                **{receiverName}** rolled a {receiverRoll} on a {diceSize} sided dice.\n"""
+        await ctx.send(embed=embed)
+        senderDice.append(senderRoll)
+        receiverDice.append(receiverRoll)
+        await asyncio.sleep(2)
+    winCondition = diceData["WINMETHOD"]
+    winner = None
+    if winCondition == "high":
+        senderResult = "rolled a high of **" + str(max(senderDice)) + "**."
+        receiverResult = "rolled a high of **" + str(max(receiverDice)) + "**."
+        if max(senderDice) > max(receiverDice):
+            winner = senderID
+        elif max(senderDice) < max(receiverDice):
+            winner = receiverID
+    elif winCondition == "low":
+        senderResult = "rolled a low of **" + str(min(senderDice)) + "**."
+        receiverResult = "rolled a low of **" + str(min(receiverDice)) + "**."
+        if min(senderDice) < min(receiverDice):
+            winner = senderID
+        elif min(senderDice) > min(receiverDice):
+            winner = receiverID
+    elif winCondition == "wins":
+        senderWins = 0
+        receiverWins = 0
+        for i in range(len(senderDice)):
+            if senderDice[i] > receiverDice[i]:
+                senderWins += 1
+            elif senderDice[i] < receiverDice[i]:
+                receiverWins += 1
+        senderResult = "won **" + str(senderWins) + "** games"
+        receiverResult = "won **" + str(receiverWins) + "** games"
+        if senderWins > receiverWins:
+            winner = senderID
+        elif senderWins < receiverWins:
+            winner = receiverID
+    else:
+        senderResult = "rolled a total of **" + str(sum(senderDice)) + "**."
+        receiverResult = "rolled a total of **" + str(sum(receiverDice)) + "**."
+        if sum(senderDice) > sum(receiverDice):
+            winner = senderID
+        elif sum(senderDice) < sum(receiverDice):
+            winner = receiverID
+    embed = makeEmbed()
+    if winner is None:
+        embed.description = f"**{senderName}** {senderResult}\n**{receiverName}** {receiverResult}\n\nIt's a tie!"
+        embed.color = discord.Color.blue()
+        await ctx.send(embed=embed)
+
+        with open(f"players/{senderID}.json", "r") as read_file:
+            senderData = json.load(read_file)
+        senderData["BALANCE"] += diceData["AMOUNT"]
+        with open(f"players/{senderID}.json", "w") as write_file:
+            json.dump(senderData, write_file)
+
+        with open(f"players/{receiverID}.json", "r") as read_file:
+            receiverData = json.load(read_file)
+        receiverData["BALANCE"] += diceData["AMOUNT"]
+        with open(f"players/{receiverID}.json", "w") as write_file:
+            json.dump(receiverData, write_file)
+        os.remove(f"dicereqs/{diceGame}")
+        return
+    pot = diceData["AMOUNT"] * 2
+    winnerName = getFullName(winner)
+    embed.description = f"""**{senderName}** {senderResult}\n**{receiverName}** {receiverResult}\n\n{winnerName} wins! They receive **${pot}**"""
+    with open(f"players/{winner}.json", "r") as read_file:
+        winnerData = json.load(read_file)
+    winnerData["BALANCE"] += pot
+    with open(f"players/{winner}.json", "w") as write_file:
+        json.dump(winnerData, write_file)
+    await ctx.send(embed=embed)
+    os.remove(f"dicereqs/{diceGame}")
+
+
+
 
 
 def isNumInLimits(number, low, high):
