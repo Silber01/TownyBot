@@ -5,6 +5,7 @@ import json
 import time
 
 from tbLib.makeEmbed import makeEmbed
+from tbLib.playerData import *
 
 waitTime = 10
 
@@ -45,8 +46,7 @@ async def catchHandler(ctx):
 async def jobHandler(ctx, timeToUse, level, plotName, xp, flavorText, sidebarColor):
     embed = makeEmbed()
     userID = ctx.author.id
-    with open(f"players/{userID}.json", "r") as read_file:
-        userData = json.load(read_file)
+    userData = getPlayerData(userID)
     currentTime = int(time.time())
     timeSince = currentTime - userData[timeToUse]
     if timeSince < waitTime:
@@ -69,5 +69,4 @@ async def jobHandler(ctx, timeToUse, level, plotName, xp, flavorText, sidebarCol
         embed.color = sidebarColor
         await ctx.send(embed=embed)
         userData[timeToUse] = currentTime
-        with open(f"players/{userID}.json", "w") as write_file:
-            json.dump(userData, write_file)
+        setPlayerData(userID, userData)

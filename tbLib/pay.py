@@ -4,6 +4,7 @@ import discord
 
 from tbLib.identifier import identify, getFullName, isNumInLimits
 from tbLib.makeEmbed import makeEmbed
+from tbLib.playerData import *
 
 async def payHandler(ctx, person, amount):
     embed = makeEmbed()
@@ -14,8 +15,7 @@ async def payHandler(ctx, person, amount):
         embed.description = receiverID.replace("ERROR ", "")
         await ctx.send(embed=embed)
         return
-    with open(f"players/{senderID}.json", "r") as read_file:
-        senderData = json.load(read_file)
+    senderData = getPlayerData(senderID)
     canSend = isNumInLimits(amount, 1, senderData["BALANCE"])
     if canSend == "NaN":
         embed.description = "Please enter a number for the amount you want to pay."
@@ -31,14 +31,11 @@ async def payHandler(ctx, person, amount):
         return
     embed.description = f"{getFullName(senderID)} has successfully paid {getFullName(receiverID)} **${amount}**."
     await ctx.send(embed=embed)
-    with open(f"players/{receiverID}.json", "r") as read_file:
-        receiverData = json.load(read_file)
+    receiverData = getPlayerData(receiverID)
     senderData["BALANCE"] -= int(amount)
     receiverData["BALANCE"] += int(amount)
-    with open(f"players/{receiverID}.json", "w") as write_file:
-        json.dump(receiverData, write_file)
-    with open(f"players/{senderID}.json", "w") as write_file:
-        json.dump(senderData, write_file)
+    setPlayerData(senderID, senderData)
+    setPlayerData(receiverID, receiverData)
 
 
 

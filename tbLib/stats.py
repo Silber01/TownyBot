@@ -5,6 +5,7 @@ import json
 from tbLib.identifier import identify, getFullName
 from tbLib.makeEmbed import makeEmbed
 from tbLib.jobs import calculateNextLevel
+from tbLib.playerData import *
 
 
 async def identifyAndHandleError(ctx, name):
@@ -26,8 +27,7 @@ async def statsHandler(ctx, name):
     userID = await identifyAndHandleError(ctx, name)
     if userID == "ERROR":
         return
-    with open(f"players/{userID}.json", "r") as read_file:
-        userData = json.load(read_file)
+    userData = getPlayerData(userID)
     with open("non-code/stats.txt") as read_file:
         statsMsg = read_file.read()
     statsMsg = statsMsg.replace("USERNAME", userData["NAME"])
@@ -46,20 +46,19 @@ async def balanceHandler(ctx, name):
     userID = await identifyAndHandleError(ctx, name)
     if userID == "ERROR":
         return
-    with open(f"players/{userID}.json", "r") as read_file:
-        userData = json.load(read_file)
+    userData = getPlayerData(userID)
     username = userData["NAME"]
     balance = userData["BALANCE"]
     embed.description = f"**{username}'s balance**: ${balance}"
     await ctx.send(embed=embed)
+
 
 async def levelsHandler(ctx, name):
     embed = makeEmbed()
     userID = await identifyAndHandleError(ctx, name)
     if userID == "ERROR":
         return
-    with open(f"players/{userID}.json", "r") as read_file:
-        userData = json.load(read_file)
+    userData = getPlayerData(userID)
     with open("non-code/levels.txt", "r") as read_file:
         levelsMsg = read_file.read()
     levelsMsg = levelsMsg.replace("USERNAME", str(userData["NAME"]))
@@ -82,9 +81,9 @@ async def levelsHandler(ctx, name):
 async def baltopHandler(ctx, page):
     users = {}
     for user in os.listdir("players"):
-        with open(f"players/{user}", "r") as read_file:
-            userData = json.load(read_file)
-        userName = getFullName(user.replace(".json", ""))
+        user = user.replace(".json", "")
+        userData = getPlayerData(user)
+        userName = getFullName(user)
         userBal = userData["BALANCE"]
         users[userName] = userBal
     sortedUsers = sorted(users.items(), key=lambda x: x[1], reverse=True)
@@ -107,5 +106,3 @@ async def baltopHandler(ctx, page):
 
     embed.set_footer(text="You are in position #" + str(authorPos))
     await ctx.send(embed=embed)
-
-

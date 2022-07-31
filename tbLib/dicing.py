@@ -7,6 +7,7 @@ import asyncio
 
 from tbLib.identifier import identify, getFullName, isNumInLimits
 from tbLib.makeEmbed import makeEmbed
+from tbLib.playerData import *
 
 
 async def deqDiceTTLs(client, seconds):
@@ -87,10 +88,8 @@ async def diceHandler(ctx, receiver, dicesize, dices, winmethod, amount):
         embed.description = """Invalid win method. Please pick from "high", "low", "wins", or "total"."""
         await ctx.send(embed=embed)
         return
-    with open(f"players/{ctx.author.id}.json", "r") as read_file:
-        senderBal = int(json.load(read_file)["BALANCE"])
-    with open(f"players/{receiverID}.json", "r") as read_file:
-        receiverBal = int(json.load(read_file)["BALANCE"])
+    senderBal = getPlayerBalance(ctx.author.id)
+    receiverBal = getPlayerBalance(receiverID)
     amountCheck = isNumInLimits(amount, 1, min(senderBal, receiverBal))
     if amountCheck == "NaN":
         embed.description = "Amount is not a number!"
@@ -183,10 +182,8 @@ async def acceptHandler(ctx):
     receiverDice = []
     dices = diceData["DICES"]
     diceSize = diceData["DICESIZE"]
-    with open(f"players/{receiverID}.json", "r") as read_file:
-        receiverData = json.load(read_file)
-    with open(f"players/{senderID}.json", "r") as read_file:
-        senderData = json.load(read_file)
+    receiverData = getPlayerData(receiverID)
+    senderData = getPlayerData(senderID)
     if receiverData["BALANCE"] < diceData["AMOUNT"]:
         embed = makeEmbed()
         embed.description = f"{getFullName(receiverID)} does not have enough money!"
@@ -201,13 +198,11 @@ async def acceptHandler(ctx):
         return
     senderData["BALANCE"] -= diceData["AMOUNT"]
     receiverData["BALANCE"] -= diceData["AMOUNT"]
-    with open(f"players/{receiverID}.json", "w") as write_file:
-        json.dump(receiverData, write_file)
-    with open(f"players/{senderID}.json", "w") as write_file:
-        json.dump(senderData, write_file)
-
+    setPlayerData(receiverID, receiverData)
+    setPlayerData(senderID, senderData)
     for i in range(dices):
         senderRoll = random.randint(0, diceSize)
+        await asyncio.sleep(0.1)
         receiverRoll = random.randint(0, diceSize)
         embed = makeEmbed()
         embed.description = f"""**{senderName}** rolled a {senderRoll} on a {diceSize} sided dice.\n
@@ -259,36 +254,23 @@ async def acceptHandler(ctx):
         embed.color = discord.Color.blue()
         await ctx.send(embed=embed)
 
-        with open(f"players/{senderID}.json", "r") as read_file:
-            senderData = json.load(read_file)
-        senderData["BALANCE"] += diceData["AMOUNT"]
-        with open(f"players/{senderID}.json", "w") as write_file:
-            json.dump(senderData, write_file)
-
-        with open(f"players/{receiverID}.json", "r") as read_file:
-            receiverData = json.load(read_file)
-        receiverData["BALANCE"] += diceData["AMOUNT"]
-        with open(f"players/{receiverID}.json", "w") as write_file:
-            json.dump(receiverData, write_file)
+        changePlayerBalance(senderID, diceData["AMOUNT"])
+        changePlayerBalance(receiverID, diceData["AMOUNT"])
         os.remove(f"dicereqs/{diceGame}")
         return
     pot = diceData["AMOUNT"] * 2
     winnerName = getFullName(winner)
     embed.description = f"""**{senderName}** {senderResult}\n**{receiverName}** {receiverResult}\n\n{winnerName} wins! They receive **${pot}**"""
-    with open(f"players/{winner}.json", "r") as read_file:
-        winnerData = json.load(read_file)
-    winnerData["BALANCE"] += pot
-    with open(f"players/{winner}.json", "w") as write_file:
-        json.dump(winnerData, write_file)
+    changePlayerBalance(winner, pot)
     embed.color = discord.Color.green()
     await ctx.send(embed=embed)
     os.remove(f"dicereqs/{diceGame}")
 
-def isInDice(id):
-    if id + ".json" in os.listdir("dicereqs"):
+def isInDice(diceID):
+    if diceID + ".json" in os.listdir("dicereqs"):
         return True
     for dice in os.listdir("dicereqs"):
         with open(f"dicereqs/{dice}", "r") as read_file:
-            if json.load(read_file)["RECEIVER"] == id:
+            if json.load(read_file)["RECEIVER"] == diceID:
                 return True
     return False
