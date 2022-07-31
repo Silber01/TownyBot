@@ -63,9 +63,9 @@ async def jobHandler(ctx, timeToUse, level, plotName, xp, flavorText, sidebarCol
         while userData[xp] > calculateNextLevel(userData[level]):
             userData[xp] -= calculateNextLevel(userData[level])
             userData[level] += 1
-            embed.description += f"\n\n**LEVEL UP!!** You are now level" + str(userData[level]) + "."
-        embed.description += "\n\nProgress: " + str(userData[xp]) + "/" + str(
-            calculateNextLevel(userData[level]))
+            embed.description += f"\n\n**LEVEL UP!!** You are now level " + str(userData[level]) + "."
+        embed.set_footer(text="Level: " + str(userData[level]) + ", Progress: " + str(userData[xp]) + "/" + str(
+            calculateNextLevel(userData[level])))
         embed.color = sidebarColor
         await ctx.send(embed=embed)
         userData[timeToUse] = currentTime

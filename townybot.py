@@ -1,15 +1,14 @@
 import json  # allows reading and writing of JSON files
 import os
-from os.path import exists
-import discord  # provides some additional discord features, such as embedded messages
 from discord.ext import commands  # provides the bulk of discord bot abilities
 import asyncio
 
 from tbLib.help import helpHandler, commandsHandler
 from tbLib.nameGenerator import generateName
-from tbLib.stats import statsHandler, balanceHandler, levelsHandler
+from tbLib.stats import statsHandler, balanceHandler, levelsHandler, baltopHandler
 from tbLib.jobs import mineHandler, chopHandler, harvestHandler, catchHandler
 from tbLib.dicing import diceHandler, deqDiceTTLs, denyHandler, cancelHandler, acceptHandler
+from tbLib.pay import payHandler
 
 client = commands.Bot(command_prefix='-', help_command=None)  # sets prefix and deletes default help command
 
@@ -58,13 +57,20 @@ async def stats(ctx, name="NONE"):
 async def balance(ctx, name="NONE"):
     await balanceHandler(ctx, name)
 
+
 @client.command()
 async def bal(ctx, name="NONE"):
     await balanceHandler(ctx, name)
 
+
 @client.command()
 async def levels(ctx, name="NONE"):
     await levelsHandler(ctx, name)
+
+
+@client.command()
+async def baltop(ctx, page=1):
+    await baltopHandler(ctx, page)
 
 
 # -------- Jobs ---------------
@@ -88,7 +94,7 @@ async def catch(ctx):
     await catchHandler(ctx)
 
 
-# -------- Jobs ---------------
+# -------- Town ---------------
 
 
 # -------- Dicing ---------------
@@ -109,6 +115,18 @@ async def dice(ctx, *args):
             "Invalid arguments! Syntax is `-dice <player> <dice size> <dices thrown> <win method (high, low, wins, total)>, <bet>`")
     else:
         await diceHandler(ctx, args[0], args[1], args[2], args[3], args[4])
+
+
+# --------- Misc -----------
+@client.command()
+async def pay(ctx, *args):
+    if len(args) != 2:
+        await ctx.send("Invalid arguments! Syntax is `-pay <player> <amount>")
+    await payHandler(ctx, args[0], args[1])
+
+@client.command()
+async def egirl(ctx):
+    await ctx.send("chloe...")
 
 
 with open("non-code/key.txt", "r") as readFile:

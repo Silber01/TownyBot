@@ -30,3 +30,6 @@
 `-dice <player> <dice size> <dice rolls> <win condition> <amount>`: Challenges given player to a dice roll with given dice size, amount of rolls, and win condition for given amount, if both players can afford it.
 `-dice accept`: Accepts current dice challenge.
 `-dice deny`: Refuses current dice challenge.
+
+**Misc**
+`-pay <player> <amount>`: Pays specified player the specified amount

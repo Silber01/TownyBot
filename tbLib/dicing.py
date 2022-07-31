@@ -5,9 +5,8 @@ import os
 import json
 import asyncio
 
-from tbLib.identifier import identify, getFullName
+from tbLib.identifier import identify, getFullName, isNumInLimits
 from tbLib.makeEmbed import makeEmbed
-
 
 
 async def deqDiceTTLs(client, seconds):
@@ -146,6 +145,7 @@ async def denyHandler(ctx):
     os.remove(f"dicereqs/{diceToCancel}")
     await ctx.send(embed=embed)
 
+
 async def cancelHandler(ctx):
     senderID = str(ctx.author.id)
     embed = makeEmbed()
@@ -158,6 +158,7 @@ async def cancelHandler(ctx):
         embed.description = "You are not in a dice game!"
         embed.color = discord.Color.red()
         await ctx.send(embed=embed)
+
 
 async def acceptHandler(ctx):
     receiverID = str(ctx.author.id)
@@ -279,24 +280,9 @@ async def acceptHandler(ctx):
     winnerData["BALANCE"] += pot
     with open(f"players/{winner}.json", "w") as write_file:
         json.dump(winnerData, write_file)
+    embed.color = discord.Color.green()
     await ctx.send(embed=embed)
     os.remove(f"dicereqs/{diceGame}")
-
-
-
-
-
-def isNumInLimits(number, low, high):
-    try:
-        value = int(number)
-    except ValueError:
-        return "NaN"
-    if value < low:
-        return "LOW"
-    if value > high:
-        return "HIGH"
-    return "VALID"
-
 
 def isInDice(id):
     if id + ".json" in os.listdir("dicereqs"):

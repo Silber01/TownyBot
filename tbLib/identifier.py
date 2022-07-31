@@ -55,3 +55,15 @@ def getFullName(id):
     with open(f"players/{id}.json", "r") as read_file:
         playerData = json.load(read_file)
     return playerData["NAME"] + "#" + playerData["DISCRIMINATOR"]
+
+
+def isNumInLimits(number, low, high):
+    try:
+        value = int(number)
+    except ValueError:
+        return "NaN"
+    if value < low:
+        return "LOW"
+    if value > high:
+        return "HIGH"
+    return "VALID"

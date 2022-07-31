@@ -1,6 +1,8 @@
+import os
+
 import discord
 import json
-from tbLib.identifier import identify
+from tbLib.identifier import identify, getFullName
 from tbLib.makeEmbed import makeEmbed
 from tbLib.jobs import calculateNextLevel
 
@@ -77,5 +79,33 @@ async def levelsHandler(ctx, name):
     await ctx.send(embed=embed)
 
 
+async def baltopHandler(ctx, page):
+    users = {}
+    for user in os.listdir("players"):
+        with open(f"players/{user}", "r") as read_file:
+            userData = json.load(read_file)
+        userName = getFullName(user.replace(".json", ""))
+        userBal = userData["BALANCE"]
+        users[userName] = userBal
+    sortedUsers = sorted(users.items(), key=lambda x: x[1], reverse=True)
+    embed = makeEmbed()
+    embed.description = "**__Baltop:__**\n"
+    place = 0
+    leaderboardSize = 10
+    startPlace = (int(page) - 1) * leaderboardSize
+    leaderboard = []
+    authorPos = 0
+    for user in sortedUsers:
+        if user[0] == getFullName(str(ctx.author.id)):
+            authorPos = place + 1
+        if startPlace <= place < startPlace + leaderboardSize:
+            userStats = [f"{place + 1}. **{user[0]}**", user[1]]
+            leaderboard.append(userStats)
+        place += 1
+    for user in leaderboard:
+        embed.description += "\n" + user[0] + ": $" + str(user[1])
+
+    embed.set_footer(text="You are in position #" + str(authorPos))
+    await ctx.send(embed=embed)
 
 
