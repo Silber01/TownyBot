@@ -6,6 +6,7 @@ from tbLib.identifier import identify, getFullName
 from tbLib.makeEmbed import makeEmbed
 from tbLib.jobs import calculateNextLevel
 from tbLib.playerData import *
+from tbLib.townsData import getTownName
 
 
 # returns stats of specified user
@@ -20,7 +21,7 @@ async def statsHandler(ctx, name):
     # replace various keywords with wanted values
     statsMsg = statsMsg.replace("USERNAME", userData["NAME"])
     statsMsg = statsMsg.replace("BALANCE", str(userData["BALANCE"]))
-    statsMsg = statsMsg.replace("TOWN", userData["TOWN"])
+    statsMsg = statsMsg.replace("TOWN", getTownName(userData["TOWN"]))
     statsMsg = statsMsg.replace("MINELVL", str(userData["MINELVL"]))
     statsMsg = statsMsg.replace("WOODLVL", str(userData["WOODLVL"]))
     statsMsg = statsMsg.replace("FARMINGLVL", str(userData["FARMLVL"]))

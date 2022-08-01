@@ -26,8 +26,14 @@ def calculateNextLevel(level):                                          # calcul
     return int(100 * level ** 1.2)
 
 
+mineFlavor = ["While you were out mining, you saw a huge ore of gold! But, on closer look, it turned out to just be some yellow rock. Luckily, the next town over loves yellow rock!",
+              "After mining all day looking for some copper, you come up empty! Oh well, the minecart full of emeralds and rubies will have to do.",
+              "While mining some iron out, you wonder what this iron will be used for. However, as your pickaxe breaks from mining it, you suddenly know exactly what it will be used for.",
+              "If you've ever wondered how much dynamite it takes to find gold, your research shows you will need at least a few dozen pounds.",
+              "After the wheel on your minecart broke, you start to envy just how much gold you have to carry out."]
+
 async def mineHandler(ctx):
-    await jobHandler(ctx, "LASTMINE", "MINELVL", "MINES", "MINEXP", "You mined.", discord.Color.teal())
+    await jobHandler(ctx, "LASTMINE", "MINELVL", "MINES", "MINEXP", random.choice(mineFlavor), discord.Color.teal())
 
 
 async def chopHandler(ctx):
@@ -65,8 +71,8 @@ async def jobHandler(ctx, timeToUse, level, plotName, xp, flavorText, sidebarCol
             userData[level] += 1
             embed.description += f"\n\n**LEVEL UP!!** You are now level " + str(userData[level]) + "."
         embed.set_footer(text="Level: " + str(userData[level]) + ", Progress: " + str(userData[xp]) + "/" + str(
-            calculateNextLevel(userData[level])))                       # put level and xp progress in footer
+            calculateNextLevel(userData[level])) + f". You now have ${getPlayerBalance(ctx.author.id)}.")                       # put level and xp progress in footer
         embed.color = sidebarColor
+        userData[timeToUse] = currentTime  # set last time action was done
+        setPlayerData(userID, userData)  # dump player data to their JSON file
         await ctx.send(embed=embed)
-        userData[timeToUse] = currentTime                               # set last time action was done
-        setPlayerData(userID, userData)                                 # dump player data to their JSON file

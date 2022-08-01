@@ -1,5 +1,7 @@
 import json  # allows reading and writing of JSON files
 import os
+
+import discord
 from discord.ext import commands  # provides the bulk of discord bot abilities
 import asyncio
 
@@ -9,6 +11,8 @@ from tbLib.stats import statsHandler, balanceHandler, levelsHandler, baltopHandl
 from tbLib.jobs import mineHandler, chopHandler, harvestHandler, catchHandler
 from tbLib.dicing import diceHandler, deqDiceTTLs, denyHandler, cancelHandler, acceptHandler
 from tbLib.pay import payHandler
+from tbLib.towncommands import townCommandsHandler
+from tbLib.playerData import *
 
 client = commands.Bot(command_prefix='-', help_command=None)  # sets prefix and deletes default help command
 
@@ -34,6 +38,12 @@ async def common(ctx):
         playerData["TOWN"] = generateName()
         with open(f"players/{userID}.json", "w") as write_file:
             json.dump(playerData, write_file)
+        return
+    playerData = getPlayerData(userID)
+    if ctx.author.name != playerData["NAME"] or ctx.author.discriminator != playerData["DISCRIMINATOR"]:
+        playerData["NAME"] = ctx.author.name
+        playerData["DISCRIMINATOR"] = ctx.author.discriminator
+        setPlayerData(userID, playerData)
 
 
 # --------- Help ---------------
@@ -95,6 +105,12 @@ async def catch(ctx):
 
 
 # -------- Town ---------------
+@client.command()
+async def town(ctx, *args):
+    argsAsList = []
+    for arg in args:
+        argsAsList.append(arg)
+    await townCommandsHandler(ctx, argsAsList)
 
 
 # -------- Dicing ---------------
@@ -127,6 +143,7 @@ async def pay(ctx, *args):
 @client.command()
 async def egirl(ctx):
     await ctx.send("chloe...")
+
 
 
 with open("non-code/key.txt", "r") as readFile:

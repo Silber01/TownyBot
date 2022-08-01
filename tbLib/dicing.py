@@ -34,7 +34,7 @@ async def diceHandler(ctx, receiver, dicesize, dices, winmethod, amount):
     embed = makeEmbed()
     embed.color = discord.Color.red()
     minDiceSize = 2                                             # minimum sides a die can have
-    maxDiceSize = 1000                                          # maximum sides a die can have
+    maxDiceSize = 1000000000                                    # maximum sides a die can have
     minDices = 1                                                # minimum amount of dice to roll
     maxDices = 10                                               # maximum amount of dice to roll
     winMethods = ["high", "low", "total", "wins"]               # all possible rulesets players can use
@@ -121,7 +121,9 @@ async def diceHandler(ctx, receiver, dicesize, dices, winmethod, amount):
     # setup flavor text and expiration notice, then send
     embed.description = f"""__**DICE GAME STARTED**__\n\n **{getFullName(str(ctx.author.id))}** has challenged **{getFullName(receiverID)}** to a dice game!\n
                         **{dices} {dicesize}**-sided dice will be rolled, and the win condition is **"{winmethod}"**!\n
-                        Both players are putting in $**{amount}**, and winner takes all!"""
+                        Both players are putting in $**{amount}**, and winner takes all!
+                        \n{getFullName(receiverID)}, do `-dice accept` to accept the dice request, or `-dice deny` to deny the dice request.
+                        \n{getFullName(str(ctx.author.id))}, do `-dice cancel` to cancel the dice game."""
     embed.set_footer(text="This request expires in " + str(int(ttl / 60)) + " minutes, " + str(ttl % 60) + " seconds.")
     embed.color = discord.Color.green()
     await ctx.send(embed=embed)
@@ -202,7 +204,7 @@ async def acceptHandler(ctx):
         await ctx.send(embed=embed)
         return
     diceData["TTL"] = 1000                                      # sets ttl to 1000 to avoid it expiring while the game is going
-    with open(f"dicereqs/{diceGame}.json", "w") as write_file:  # dumps dice data to establish new ttl
+    with open(f"dicereqs/{diceGame}", "w") as write_file:  # dumps dice data to establish new ttl
         json.dump(diceGame, write_file)
     senderData["BALANCE"] -= diceData["AMOUNT"]                 # removes bet money from sender. This and the receiver money will be given back to the winner after the dice
     receiverData["BALANCE"] -= diceData["AMOUNT"]               # removes bet money from receiver

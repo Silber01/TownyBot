@@ -20,9 +20,13 @@ def getPlayerBalance(playerID):
     return getPlayerData(playerID)["BALANCE"]
 
 
+# returns town ID of given player
+def getPlayerTown(playerID):
+    return getPlayerData(playerID)["TOWN"]
+
+
 # changes the balance of a given player by a given amount
 def changePlayerBalance(playerID, amount):
     playerData = getPlayerData(playerID)
     playerData["BALANCE"] += amount
     setPlayerData(playerID, playerData)
-
