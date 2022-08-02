@@ -98,9 +98,17 @@ async def chop(ctx):
 async def harvest(ctx):
     await harvestHandler(ctx)
 
+@client.command()
+async def farm(ctx):
+    await harvestHandler(ctx)
+
 
 @client.command()
 async def catch(ctx):
+    await catchHandler(ctx)
+
+@client.command()
+async def fish(ctx):
     await catchHandler(ctx)
 
 

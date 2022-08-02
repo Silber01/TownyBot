@@ -1,5 +1,7 @@
 import os
 import json
+import time
+
 import discord
 import secrets
 
@@ -62,6 +64,8 @@ async def newTown(ctx, name="NONE"):
 
 
 async def makeMapHandler(ctx, town="NONE"):
+    if not await canMakeMap(ctx):
+        return
     if town == "NONE":
         townID = getPlayerTown(ctx.author.id)
     else:
@@ -78,6 +82,8 @@ async def makeMapHandler(ctx, town="NONE"):
 
 
 async def makeForSaleMapHandler(ctx, town="NONE"):
+    if not await canMakeMap(ctx):
+        return
     if town == "NONE":
         townID = getPlayerTown(ctx.author.id)
     else:
@@ -94,6 +100,8 @@ async def makeForSaleMapHandler(ctx, town="NONE"):
 
 
 async def makeOwnerMapHandler(ctx, resident="NONE"):
+    if not await canMakeMap(ctx):
+        return
     if resident == "NONE":
         residentID = str(ctx.author.id)
     else:
@@ -104,7 +112,6 @@ async def makeOwnerMapHandler(ctx, resident="NONE"):
             embed.color = discord.Color.red()
             await ctx.send(embed=embed)
             return
-        townID = getPlayerTown(identify(resident))
     townID = getPlayerTown(residentID)
     if townID == "NONE":
         embed = makeEmbed()
@@ -115,3 +122,18 @@ async def makeOwnerMapHandler(ctx, resident="NONE"):
     townFile = makeOwnerMap(townID, residentID)
     await ctx.send(file=discord.File(townFile))
     os.remove(townFile)
+
+
+async def canMakeMap(ctx):
+    mapTimer = 3
+    playerData = getPlayerData(ctx.author.id)
+    lastMap = playerData["LASTMAP"] - int(time.time())
+    if lastMap < mapTimer:
+        embed = makeEmbed()
+        embed.color = discord.Color.red()
+        embed.description = f"You must wait {mapTimer - lastMap} more seconds to make a map."
+        await ctx.send(embed=embed)
+        return False
+    playerData["LASTMAP"] = int(time.time())
+    setPlayerData(ctx.author.id, playerData)
+    return True
