@@ -12,8 +12,9 @@ from tbLib.stats import statsHandler, balanceHandler, levelsHandler, baltopHandl
 from tbLib.jobs import mineHandler, chopHandler, harvestHandler, catchHandler
 from tbLib.dicing import diceHandler, deqDiceTTLs, denyHandler, cancelHandler, acceptHandler
 from tbLib.pay import payHandler
-from tbLib.towncommands import townCommandsHandler
+from tbLib.townycommands import townCommandsHandler, plotCommandsHandler
 from tbLib.playerData import *
+from tbLib.plots import plotInfo
 
 client = commands.Bot(command_prefix='-', help_command=None)  # sets prefix and deletes default help command
 
@@ -120,6 +121,13 @@ async def town(ctx, *args):
     for arg in args:
         argsAsList.append(arg)
     await townCommandsHandler(ctx, argsAsList, client)
+
+@client.command()
+async def plot(ctx, *args):
+    argsAsList = []
+    for arg in args:
+        argsAsList.append(arg)
+    await plotCommandsHandler(ctx, argsAsList, client)
 
 
 # -------- Dicing ---------------

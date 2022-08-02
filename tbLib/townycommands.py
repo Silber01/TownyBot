@@ -8,14 +8,20 @@ async def townCommandsHandler(ctx, args, client):
     if argsCount == 0:
         await townsHelp(ctx)
         return
+    if args[0] == "info":
+        if argsCount == 1:
+            await townInfoHandler(ctx)
+        else:
+            await townInfoHandler(ctx, args[1])
+        return
     if args[0] == "new":
         if argsCount == 1:
-            await newTown(ctx)
+            await newTownHandler(ctx)
         else:
-            await newTown(ctx, args[1])
+            await newTownHandler(ctx, args[1])
         return
     if args[0] == "delete":
-        await deleteTown(ctx, client)
+        await deleteTownHandler(ctx, client)
     if args[0] == "map":
         if argsCount == 1:
             await makeMapHandler(ctx)
@@ -34,4 +40,8 @@ async def townCommandsHandler(ctx, args, client):
         else:
             await makeForSaleMapHandler(ctx, args[1])
         return
+
+
+async def plotCommandsHandler(ctx, args, client):
+    argsCount = len(args)
 

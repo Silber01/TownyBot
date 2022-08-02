@@ -11,7 +11,7 @@ from tbLib.makeEmbed import makeEmbed
 from tbLib.nameGenerator import generateName
 from tbLib.townsData import *
 from tbLib.makeMap import makeForSaleMap, makeOwnerMap, makeMap
-from tbLib.identifier import identify
+from tbLib.identifier import identify, getFullName
 
 townCost = 25000
 plainText = "PLAIN"
@@ -30,7 +30,33 @@ async def townsHelp(ctx):
     await ctx.send("I'll implement this help screen later")
 
 
-async def newTown(ctx, name="NONE"):
+async def townInfoHandler(ctx, name="NONE"):
+    embed = makeEmbed()
+    embed.color = discord.Color.red()
+    if name == "NONE":
+        townID = getPlayerTown(ctx.author.id)
+        if townID == "NONE":
+            embed.description = "You are not in a town!"
+            await ctx.send(embed=embed)
+            return
+    else:
+        townID = findTownID(name)
+        if townID == "NONE":
+            embed = makeEmbed()
+            embed.description = "That town does not exist!"
+            await ctx.send(embed=embed)
+            return
+    townData = getTownData(townID)
+    townName = townData["NAME"]
+    townMayor = townData["MAYOR"]
+    townTax = townData["PLOTTAX"]
+    plotPrice = townData["PLOTPRICE"]
+    embed.color = discord.Color.purple()
+    embed.description = f"Information for **{townName}**:\n\nMayor: **{getFullName(townMayor)}**\nTaxes per plot owned: **${townTax}**/day\nPrice to buy a plot: **${plotPrice}**"
+    await ctx.send(embed=embed)
+
+
+async def newTownHandler(ctx, name="NONE"):
     playerID = str(ctx.author.id)
     playerData = getPlayerData(playerID)
     embed = makeEmbed()
@@ -46,6 +72,10 @@ async def newTown(ctx, name="NONE"):
     townID = secrets.token_hex(16)
     if name == "NONE":
         townName = generateName()
+    if findTownID(name) != "NONE":
+        embed.description = f"There is already a town with this name!"
+        await ctx.send(embed=embed)
+        return
     else:
         townName = name
     with open(f"non-code/inittown.json", "r") as read_file:
@@ -64,7 +94,7 @@ async def newTown(ctx, name="NONE"):
     await ctx.send(embed=embed)
 
 
-async def deleteTown(ctx, client):
+async def deleteTownHandler(ctx, client):
     embed = makeEmbed()
     userID = str(ctx.author.id)
     if not isMayor(userID):
@@ -78,8 +108,9 @@ async def deleteTown(ctx, client):
 
     def check(m):
         return m.author == ctx.author
+
     try:
-        msg = await client.wait_for("message", check=check, timeout = 30)
+        msg = await client.wait_for("message", check=check, timeout=30)
     except asyncio.TimeoutError:
         embed.description = "Town deletion request timed out."
         await ctx.send(embed=embed)
@@ -103,6 +134,7 @@ async def deleteTown(ctx, client):
     for user in evicted:
         embed.description += user + "\n"
     await ctx.send(embed=embed)
+
 
 async def makeMapHandler(ctx, town="NONE"):
     if not await canMakeMap(ctx):
