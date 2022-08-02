@@ -12,6 +12,7 @@ from tbLib.nameGenerator import generateName
 from tbLib.townsData import *
 from tbLib.makeMap import makeForSaleMap, makeOwnerMap, makeMap
 from tbLib.identifier import identify, getFullName
+from tbLib.plots import makePlot, calculateNextPlot
 
 townCost = 25000
 plainText = "PLAIN"
@@ -20,10 +21,6 @@ forestText = "FOREST"
 farmText = "FARM"
 pondText = "POND"
 housesText = "HOUSES"
-
-
-def makePlot(owner, plottype):
-    return {"OWNER": owner, "PLOTTYPE": plottype}
 
 
 async def townsHelp(ctx):
@@ -51,8 +48,11 @@ async def townInfoHandler(ctx, name="NONE"):
     townMayor = townData["MAYOR"]
     townTax = townData["PLOTTAX"]
     plotPrice = townData["PLOTPRICE"]
+    townSize = len(townData["PLOTS"])
     embed.color = discord.Color.purple()
-    embed.description = f"Information for **{townName}**:\n\nMayor: **{getFullName(townMayor)}**\nTaxes per plot owned: **${townTax}**/day\nPrice to buy a plot: **${plotPrice}**"
+    embed.description = f"""Information for **{townName}**:\n\nMayor: **{getFullName(townMayor)}**\nAmount of plots: **{townSize}**\n\n
+                            Taxes per plot owned: **${townTax}**/day\nPrice to own a plot: **${plotPrice}**
+                            \nPrice to annex a plot: **${calculateNextPlot(townSize)}**"""
     await ctx.send(embed=embed)
 
 
@@ -108,7 +108,6 @@ async def deleteTownHandler(ctx, client):
 
     def check(m):
         return m.author == ctx.author
-
     try:
         msg = await client.wait_for("message", check=check, timeout=30)
     except asyncio.TimeoutError:

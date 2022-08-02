@@ -1,5 +1,5 @@
 from tbLib.towns import *
-
+from tbLib.plots import *
 
 async def townCommandsHandler(ctx, args, client):
     argsCount = len(args)
@@ -40,8 +40,29 @@ async def townCommandsHandler(ctx, args, client):
         else:
             await makeForSaleMapHandler(ctx, args[1])
         return
+    if args[0] == "annex":
+        if argsCount != 2:
+            embed = makeEmbed()
+            embed.description = "Invalid syntax! Syntax is `-plot annex YX`, i.e. `-plot annex C4`."
+            await ctx.send(embed=embed)
+            return
+        await annexHandler(ctx, args[1], client)
 
 
 async def plotCommandsHandler(ctx, args, client):
     argsCount = len(args)
+    if args[0] == "info":
+        if argsCount != 2:
+            embed = makeEmbed()
+            embed.description = "Invalid syntax! Syntax is `-plot info YX`, i.e. `-plot info C4`."
+            await ctx.send(embed=embed)
+            return
+        await plotInfo(ctx, args[1])
+    if args[0] == "annex":
+        if argsCount != 2:
+            embed = makeEmbed()
+            embed.description = "Invalid syntax! Syntax is `-plot annex YX`, i.e. `-plot annex C4`."
+            await ctx.send(embed=embed)
+            return
+        await annexHandler(ctx, args[1], client)
 
