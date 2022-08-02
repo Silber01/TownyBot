@@ -127,7 +127,7 @@ async def makeOwnerMapHandler(ctx, resident="NONE"):
 async def canMakeMap(ctx):
     mapTimer = 3
     playerData = getPlayerData(ctx.author.id)
-    lastMap = playerData["LASTMAP"] - int(time.time())
+    lastMap = int(time.time()) - playerData["LASTMAP"]
     if lastMap < mapTimer:
         embed = makeEmbed()
         embed.color = discord.Color.red()
