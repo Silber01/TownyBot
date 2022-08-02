@@ -1,5 +1,6 @@
 import json  # allows reading and writing of JSON files
 import os
+import random
 
 import discord
 from discord.ext import commands  # provides the bulk of discord bot abilities
@@ -118,7 +119,7 @@ async def town(ctx, *args):
     argsAsList = []
     for arg in args:
         argsAsList.append(arg)
-    await townCommandsHandler(ctx, argsAsList)
+    await townCommandsHandler(ctx, argsAsList, client)
 
 
 # -------- Dicing ---------------
@@ -151,6 +152,35 @@ async def pay(ctx, *args):
 @client.command()
 async def egirl(ctx):
     await ctx.send("chloe...")
+
+@client.command()
+async def guessNumber(ctx):
+    num = random.randint(0, 100)
+    guesses = 0
+    await ctx.send("I'm thinking of a number from 1 to 100! Guess what the number is!")
+
+    def check(m):
+        return m.author == ctx.author
+    guess = -1
+    while guess != num:
+        msg = await client.wait_for("message", check=check)
+        try:
+            guess = int(msg.content)
+        except ValueError:
+            await ctx.send("That's not a number!")
+        else:
+            guesses += 1
+            if guess < num:
+                await ctx.send(f"Too low, {ctx.author.name}! Try again!")
+            elif guess > num:
+                await ctx.send(f"Too high, {ctx.author.name}! Try again!")
+            else:
+                await ctx.send(f"Correct, {ctx.author.name}! The number was {num}, and you got it in {guesses} guesses!")
+
+
+
+
+
 
 
 

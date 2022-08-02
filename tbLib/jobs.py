@@ -90,9 +90,10 @@ async def jobHandler(ctx, timeToUse, level, plotName, xp, flavorText, sidebarCol
             userData[xp] -= calculateNextLevel(userData[level])
             userData[level] += 1
             embed.description += f"\n\n**LEVEL UP!!** You are now level " + str(userData[level]) + "."
+        userData[timeToUse] = currentTime                               # set last time action was done
+        setPlayerData(userID, userData)                                 # dump player data to their JSON file
         embed.set_footer(text="Level: " + str(userData[level]) + ", Progress: " + str(userData[xp]) + "/" + str(
             calculateNextLevel(userData[level])) + f". You now have ${getPlayerBalance(ctx.author.id)}.")                       # put level and xp progress in footer
         embed.color = sidebarColor
-        userData[timeToUse] = currentTime  # set last time action was done
-        setPlayerData(userID, userData)  # dump player data to their JSON file
+
         await ctx.send(embed=embed)

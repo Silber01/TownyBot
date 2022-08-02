@@ -19,6 +19,8 @@ def findTownID(townName):
 
 
 def isMayor(playerID):
+    if getPlayerTown(playerID) == "NONE":
+        return False
     townData = getTownData(getPlayerTown(playerID))
     if townData["MAYOR"] == playerID:
         return True

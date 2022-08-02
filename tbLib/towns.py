@@ -1,3 +1,4 @@
+import asyncio
 import os
 import json
 import time
@@ -62,6 +63,46 @@ async def newTown(ctx, name="NONE"):
     embed.color = discord.Color.green()
     await ctx.send(embed=embed)
 
+
+async def deleteTown(ctx, client):
+    embed = makeEmbed()
+    userID = str(ctx.author.id)
+    if not isMayor(userID):
+        embed.description = "You do not own a town!"
+        embed.color = discord.Color.red()
+        await ctx.send(embed=embed)
+        return
+    embed.color = discord.Color.dark_orange()
+    embed.description = """Are you sure you want to delete your town? Your plots and your resident's plots will be gone forever!\n\nType `DELETE` to confirm"""
+    await ctx.send(embed=embed)
+
+    def check(m):
+        return m.author == ctx.author
+    try:
+        msg = await client.wait_for("message", check=check, timeout = 30)
+    except asyncio.TimeoutError:
+        embed.description = "Town deletion request timed out."
+        await ctx.send(embed=embed)
+        return
+    if msg.content.upper() != "DELETE":
+        embed.description = "Town deletion request cancelled."
+        await ctx.send(embed=embed)
+        return
+    townID = getPlayerData(ctx.author.id)["TOWN"]
+    townName = getTownName(townID)
+    evicted = []
+    for user in os.listdir("players"):
+        userID = user.replace(".json", "")
+        userData = getPlayerData(userID)
+        if userData["TOWN"] == townID:
+            userData["TOWN"] = "NONE"
+            setPlayerData(userID, userData)
+            evicted.append(userData["NAME"] + "#" + userData["DISCRIMINATOR"])
+    os.remove(f"towns/{townID}.json")
+    embed.description = f"{townName} has fallen! The following people are now homeless:\n"
+    for user in evicted:
+        embed.description += user + "\n"
+    await ctx.send(embed=embed)
 
 async def makeMapHandler(ctx, town="NONE"):
     if not await canMakeMap(ctx):

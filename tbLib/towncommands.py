@@ -1,7 +1,7 @@
 from tbLib.towns import *
 
 
-async def townCommandsHandler(ctx, args):
+async def townCommandsHandler(ctx, args, client):
     argsCount = len(args)
     for i in range(argsCount):
         args[i] = args[i].lower()
@@ -14,6 +14,8 @@ async def townCommandsHandler(ctx, args):
         else:
             await newTown(ctx, args[1])
         return
+    if args[0] == "delete":
+        await deleteTown(ctx, client)
     if args[0] == "map":
         if argsCount == 1:
             await makeMapHandler(ctx)
