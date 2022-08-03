@@ -54,29 +54,29 @@ fishFlavor = ["While out fishing, you only caught seaweed. Fortunately, a Sushi 
 
 
 async def mineHandler(ctx):
-    await jobHandler(ctx, "LASTMINE", "MINELVL", "MINES", "MINEXP", random.choice(mineFlavor), discord.Color.teal())
+    await jobHandler(ctx, "mine", "LASTMINE", "MINELVL", "MINES", "MINEXP", random.choice(mineFlavor), discord.Color.teal())
 
 
 async def chopHandler(ctx):
-    await jobHandler(ctx, "LASTCHOP", "WOODLVL", "FORESTS", "WOODXP", random.choice(chopFlavor), discord.Color.purple())
+    await jobHandler(ctx, "chop", "LASTCHOP", "WOODLVL", "FORESTS", "WOODXP", random.choice(chopFlavor), discord.Color.purple())
 
 
 async def harvestHandler(ctx):
-    await jobHandler(ctx, "LASTHARVEST", "FARMLVL", "FARMS", "FARMXP", random.choice(farmFlavor), discord.Color.gold())
+    await jobHandler(ctx, "harvest", "LASTHARVEST", "FARMLVL", "FARMS", "FARMXP", random.choice(farmFlavor), discord.Color.gold())
 
 
 async def catchHandler(ctx):
-    await jobHandler(ctx, "LASTCATCH", "FISHLVL", "PONDS", "FISHXP", random.choice(fishFlavor), discord.Color.blue())
+    await jobHandler(ctx, "catch", "LASTCATCH", "FISHLVL", "PONDS", "FISHXP", random.choice(fishFlavor), discord.Color.blue())
 
 
-async def jobHandler(ctx, timeToUse, level, plotName, xp, flavorText, sidebarColor):
+async def jobHandler(ctx, job, timeToUse, level, plotName, xp, flavorText, sidebarColor):
     embed = makeEmbed()
     userID = ctx.author.id
     userData = getPlayerData(userID)                                    # fetches player data
     currentTime = int(time.time())                                      # gets current time
     timeSince = currentTime - userData[timeToUse]                       # calculates time since last input
     if timeSince < waitTime:                                            # if timeSince is too small, let player know how much more time to wait and return
-        embed.description = f"You need to wait {waitTime - timeSince} more seconds before you mine again."
+        embed.description = f"You need to wait {waitTime - timeSince} more seconds before you {job} again."
         embed.color = discord.Color.red()
         await ctx.send(embed=embed)
         return

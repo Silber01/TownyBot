@@ -3,8 +3,12 @@ from tbLib.plots import *
 
 async def townCommandsHandler(ctx, args, client):
     argsCount = len(args)
-    for i in range(argsCount):
-        args[i] = args[i].lower()
+    if argsCount >= 1:
+        if args[0].lower() != "new":
+            for i in range(argsCount):
+                args[i] = args[i].lower()
+        else:
+            args[0] = args[0].lower()
     if argsCount == 0:
         await townsHelp(ctx)
         return
@@ -40,13 +44,8 @@ async def townCommandsHandler(ctx, args, client):
         else:
             await makeForSaleMapHandler(ctx, args[1])
         return
-    if args[0] == "annex":
-        if argsCount != 2:
-            embed = makeEmbed()
-            embed.description = "Invalid syntax! Syntax is `-plot annex YX`, i.e. `-plot annex C4`."
-            await ctx.send(embed=embed)
-            return
-        await annexHandler(ctx, args[1], client)
+    if args[0] in ["annex", "build", "clear"]:
+        await plotCommandsHandler(ctx, args, client)
 
 
 async def plotCommandsHandler(ctx, args, client):
@@ -76,5 +75,10 @@ async def plotCommandsHandler(ctx, args, client):
         if argsCount != 2:
             embed = makeEmbed()
             embed.description = "Invalid syntax! Syntax is `-plot info YX`, i.e. `-plot info C4`."
+            await ctx.send(embed=embed)
+            return
+        await clearHandler(ctx, args[1])
+    if args[0] in ["map", "ownedplots", "forsale"]:
+        await townCommandsHandler(ctx, args, client)
 
 

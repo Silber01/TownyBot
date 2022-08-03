@@ -5,8 +5,10 @@ from tbLib.playerData import *
 
 
 def getTownName(townID):
+    if townID is None:
+        return None
     if townID + ".json" not in os.listdir("towns"):
-        return "none"
+        return None
     return getTownData(townID)["NAME"]
 
 
@@ -15,11 +17,11 @@ def findTownID(townName):
         town = town.replace(".json", "")
         if getTownData(town)["NAME"].lower() == townName.lower():
             return town
-    return "NONE"
+    return None
 
 
 def isMayor(playerID):
-    if getPlayerTown(playerID) == "NONE":
+    if getPlayerTown(playerID) is None:
         return False
     townData = getTownData(getPlayerTown(playerID))
     if townData["MAYOR"] == playerID:

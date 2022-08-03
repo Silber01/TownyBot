@@ -21,7 +21,7 @@ async def statsHandler(ctx, name):
     # replace various keywords with wanted values
     statsMsg = statsMsg.replace("USERNAME", userData["NAME"])
     statsMsg = statsMsg.replace("BALANCE", str(userData["BALANCE"]))
-    statsMsg = statsMsg.replace("TOWN", getTownName(userData["TOWN"]))
+    statsMsg = statsMsg.replace("TOWN", str(getTownName(userData["TOWN"])))
     statsMsg = statsMsg.replace("MINELVL", str(userData["MINELVL"]))
     statsMsg = statsMsg.replace("WOODLVL", str(userData["WOODLVL"]))
     statsMsg = statsMsg.replace("FARMINGLVL", str(userData["FARMLVL"]))

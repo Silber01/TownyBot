@@ -17,7 +17,7 @@ def calculateNextStructurePrice(playerData, plottype):
     plottype = plottype.upper()
     if plottype not in ["MINE", "FOREST", "FARM", "POND"]:
         return -1
-    plotCount = playerData[plottype + "S"]                      # + S to convert to plural form, i.e. MINE becomes MINES, etc.
+    plotCount = playerData[plottype + "S"]  # + S to convert to plural form, i.e. MINE becomes MINES, etc.
     return 100 + (100 * (plotCount + 2) ** 2)
 
 
@@ -40,14 +40,16 @@ def userOwnsPlot(userID, townData, plot):
         return False
     return townData["PLOTS"][plot]["OWNER"] == str(userID)
 
+
 def structureIsValid(structure):
     return structure in ["MINE", "FARM", "FOREST", "POND", "HOUSE"]
+
 
 async def plotInfo(ctx, plot):
     plot = plot.upper()
     embed = makeEmbed()
     townID = getPlayerTown(ctx.author.id)
-    if townID == "NONE":
+    if townID is None:
         embed.color = discord.Color.red()
         embed.description = "You are not in a town!"
         await ctx.send(embed=embed)
@@ -88,7 +90,7 @@ async def annexHandler(ctx, plot, client):
     embed = makeEmbed()
     embed.color = discord.Color.red()
     townID = getPlayerTown(ctx.author.id)
-    if townID == "NONE":
+    if townID == None:
         embed.description = "You are not in a town!"
         await ctx.send(embed=embed)
         return
@@ -151,7 +153,7 @@ async def buildHandler(ctx, plot, structure, client):
     embed = makeEmbed()
     embed.color = discord.Color.red()
     townID = getPlayerTown(ctx.author.id)
-    if townID == "NONE":
+    if townID is None:
         embed.description = "You are not in a town!"
         await ctx.send(embed=embed)
         return
@@ -206,3 +208,32 @@ async def buildHandler(ctx, plot, structure, client):
     await ctx.send(embed=embed)
     return
 
+
+async def clearHandler(ctx, plot):
+    plot = plot.upper()
+    embed = makeEmbed()
+    embed.color = discord.Color.red()
+    townID = getPlayerTown(ctx.author.id)
+    if townID is None:
+        embed.description = "You are not in a town!"
+        await ctx.send(embed=embed)
+        return
+    if not plotIsValid(plot):
+        embed.description = "Invalid syntax! Syntax is `-plot clear YX`, i.e. `-plot clear C4`."
+        await ctx.send(embed=embed)
+        return
+    townData = getTownData(townID)
+    if not userOwnsPlot(ctx.author.id, townData, plot):
+        embed.description = "You don't own that plot!"
+        await ctx.send(embed=embed)
+        return
+    currentStructure = townData["PLOTS"][plot]["PLOTTYPE"]
+    townData["PLOTS"][plot]["PLOTTYPE"] = "PLAIN"
+    playerID = str(ctx.author.id)
+    playerData = getPlayerData(playerID)
+    playerData[currentStructure + "S"] -= 1
+    setPlayerData(playerID, playerData)
+    setTownData(townID, townData)
+    embed.description = "Plot cleared!"
+    embed.color = discord.Color.green()
+    await ctx.send(embed=embed)

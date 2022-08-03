@@ -33,13 +33,13 @@ async def townInfoHandler(ctx, name="NONE"):
     embed.color = discord.Color.red()
     if name == "NONE":
         townID = getPlayerTown(ctx.author.id)
-        if townID == "NONE":
+        if townID is None:
             embed.description = "You are not in a town!"
             await ctx.send(embed=embed)
             return
     else:
         townID = findTownID(name)
-        if townID == "NONE":
+        if townID is None:
             embed = makeEmbed()
             embed.description = "That town does not exist!"
             await ctx.send(embed=embed)
@@ -50,8 +50,11 @@ async def townInfoHandler(ctx, name="NONE"):
     townTax = townData["PLOTTAX"]
     plotPrice = townData["PLOTPRICE"]
     townSize = len(townData["PLOTS"])
+    residents = []
+    for resident in townData["RESIDENTS"]:
+        residents.append(getPlayerData(resident)["NAME"])
     embed.color = discord.Color.purple()
-    embed.description = f"""Information for **{townName}**:\n\nMayor: **{getFullName(townMayor)}**\nAmount of plots: **{townSize}**\n\n
+    embed.description = f"""Information for **{townName}**:\n\nMayor: **{getFullName(townMayor)}**\nAmount of plots: **{townSize}**\nResidents: {str(residents)[1:-1].replace("'", "")}\n\n
                             Taxes per plot owned: **${townTax}**/day\nPrice to own a plot: **${plotPrice}**
                             \nPrice to annex a plot: **${calculateNextPlot(townSize)}**
                             \n\nDo `-town map {townName}` to see a map of this town!"""
@@ -63,7 +66,7 @@ async def newTownHandler(ctx, name="NONE"):
     playerData = getPlayerData(playerID)
     embed = makeEmbed()
     embed.color = discord.Color.red()
-    if playerData["TOWN"] != "NONE":
+    if not playerData["TOWN"] is None:
         embed.description = "You are already in a town!"
         await ctx.send(embed=embed)
         return
@@ -73,8 +76,8 @@ async def newTownHandler(ctx, name="NONE"):
         return
     townID = secrets.token_hex(16)
     if name == "NONE":
-        townName = generateName()
-    if findTownID(name) != "NONE":
+        name = generateName()
+    if not findTownID(name) is None:
         embed.description = f"There is already a town with this name!"
         await ctx.send(embed=embed)
         return
@@ -89,6 +92,7 @@ async def newTownHandler(ctx, name="NONE"):
         townData["PLOTS"][plot] = makePlot(playerID, plainText)
     housePlot = random.choice(starterPlots)
     townData["PLOTS"][housePlot] = makePlot(playerID, housesText)
+    townData["RESIDENTS"].append(playerID)
     setTownData(townID, townData)
     playerData["BALANCE"] -= townCost
     playerData["TOWN"] = townID
@@ -125,19 +129,17 @@ async def deleteTownHandler(ctx, client):
         return
     townID = getPlayerData(ctx.author.id)["TOWN"]
     townName = getTownName(townID)
-    evicted = []
-    for user in os.listdir("players"):
-        userID = user.replace(".json", "")
+    evicted = getTownData(townID)["RESIDENTS"]
+    for user in evicted:
         userData = getPlayerData(userID)
-        if userData["TOWN"] == townID:
-            userData["TOWN"] = "NONE"
-            userData["PLOTS"] = 0
-            userData["MINES"] = 0
-            userData["FARMS"] = 0
-            userData["FORESTS"] = 0
-            userData["PONDS"] = 0
-            setPlayerData(userID, userData)
-            evicted.append(userData["NAME"] + "#" + userData["DISCRIMINATOR"])
+        userData["TOWN"] = "NONE"
+        userData["PLOTS"] = 0
+        userData["MINES"] = 0
+        userData["FARMS"] = 0
+        userData["FORESTS"] = 0
+        userData["PONDS"] = 0
+        setPlayerData(userID, userData)
+        evicted.append(userData["NAME"] + "#" + userData["DISCRIMINATOR"])
     os.remove(f"towns/{townID}.json")
     embed.description = f"{townName} has fallen! The following people are now homeless:\n"
     for user in evicted:
@@ -152,7 +154,7 @@ async def makeMapHandler(ctx, town="NONE"):
         townID = getPlayerTown(ctx.author.id)
     else:
         townID = findTownID(town)
-    if townID == "NONE":
+    if townID is None:
         embed = makeEmbed()
         embed.description = "This town doesn't exist!"
         embed.color = discord.Color.red()
@@ -170,7 +172,7 @@ async def makeForSaleMapHandler(ctx, town="NONE"):
         townID = getPlayerTown(ctx.author.id)
     else:
         townID = findTownID(town)
-    if townID == "NONE":
+    if townID is None:
         embed = makeEmbed()
         embed.description = "This town doesn't exist!"
         embed.color = discord.Color.red()
@@ -195,7 +197,7 @@ async def makeOwnerMapHandler(ctx, resident="NONE"):
             await ctx.send(embed=embed)
             return
     townID = getPlayerTown(residentID)
-    if townID == "NONE":
+    if townID is None:
         embed = makeEmbed()
         embed.description = "This person is not in a town!"
         embed.color = discord.Color.red()

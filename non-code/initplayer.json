@@ -10,7 +10,7 @@
   "FARMLVL": 1,
   "FISHXP": 0,
   "FISHLVL": 1,
-  "TOWN": "NONE",
+  "TOWN": null,
   "MINES": 0,
   "FORESTS": 0,
   "FARMS": 0,
