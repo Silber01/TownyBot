@@ -1,6 +1,7 @@
 import asyncio
 import os
 import json
+import random
 import time
 
 import discord
@@ -52,7 +53,8 @@ async def townInfoHandler(ctx, name="NONE"):
     embed.color = discord.Color.purple()
     embed.description = f"""Information for **{townName}**:\n\nMayor: **{getFullName(townMayor)}**\nAmount of plots: **{townSize}**\n\n
                             Taxes per plot owned: **${townTax}**/day\nPrice to own a plot: **${plotPrice}**
-                            \nPrice to annex a plot: **${calculateNextPlot(townSize)}**"""
+                            \nPrice to annex a plot: **${calculateNextPlot(townSize)}**
+                            \n\nDo `-town map {townName}` to see a map of this town!"""
     await ctx.send(embed=embed)
 
 
@@ -85,9 +87,12 @@ async def newTownHandler(ctx, name="NONE"):
     starterPlots = ["E4", "E5", "F4", "F5"]
     for plot in starterPlots:
         townData["PLOTS"][plot] = makePlot(playerID, plainText)
+    housePlot = random.choice(starterPlots)
+    townData["PLOTS"][housePlot] = makePlot(playerID, housesText)
     setTownData(townID, townData)
     playerData["BALANCE"] -= townCost
     playerData["TOWN"] = townID
+    playerData["PLOTS"] += 4
     setPlayerData(playerID, playerData)
     embed.description = f"**__NEW TOWN MADE__**\n Your new town name is {townName}!"
     embed.color = discord.Color.green()
@@ -126,6 +131,11 @@ async def deleteTownHandler(ctx, client):
         userData = getPlayerData(userID)
         if userData["TOWN"] == townID:
             userData["TOWN"] = "NONE"
+            userData["PLOTS"] = 0
+            userData["MINES"] = 0
+            userData["FARMS"] = 0
+            userData["FORESTS"] = 0
+            userData["PONDS"] = 0
             setPlayerData(userID, userData)
             evicted.append(userData["NAME"] + "#" + userData["DISCRIMINATOR"])
     os.remove(f"towns/{townID}.json")
@@ -187,7 +197,7 @@ async def makeOwnerMapHandler(ctx, resident="NONE"):
     townID = getPlayerTown(residentID)
     if townID == "NONE":
         embed = makeEmbed()
-        embed.description = "This town doesn't exist!"
+        embed.description = "This person is not in a town!"
         embed.color = discord.Color.red()
         await ctx.send(embed=embed)
         return

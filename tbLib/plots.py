@@ -9,6 +9,18 @@ from tbLib.identifier import *
 from tbLib.makeEmbed import makeEmbed
 
 
+def calculateNextPlot(plotsOwned):
+    return 250 * plotsOwned
+
+
+def calculateNextStructurePrice(playerData, plottype):
+    plottype = plottype.upper()
+    if plottype not in ["MINE", "FOREST", "FARM", "POND"]:
+        return -1
+    plotCount = playerData[plottype + "S"]                      # + S to convert to plural form, i.e. MINE becomes MINES, etc.
+    return 100 + (100 * (plotCount + 2) ** 2)
+
+
 def makePlot(owner, plottype="PLAIN"):
     return {"OWNER": owner, "PLOTTYPE": plottype}
 
@@ -23,9 +35,13 @@ def plotIsValid(plot):
     return True
 
 
-def calculateNextPlot(plotsOwned):
-    return 250 * plotsOwned
+def userOwnsPlot(userID, townData, plot):
+    if plot not in townData["PLOTS"]:
+        return False
+    return townData["PLOTS"][plot]["OWNER"] == str(userID)
 
+def structureIsValid(structure):
+    return structure in ["MINE", "FARM", "FOREST", "POND", "HOUSE"]
 
 async def plotInfo(ctx, plot):
     plot = plot.upper()
@@ -76,7 +92,6 @@ async def annexHandler(ctx, plot, client):
         embed.description = "You are not in a town!"
         await ctx.send(embed=embed)
         return
-    embed = makeEmbed()
     if not plotIsValid(plot):
         embed.description = "Invalid syntax! Syntax is `-plot annex YX`, i.e. `-plot annex C4`."
         await ctx.send(embed=embed)
@@ -106,8 +121,10 @@ async def annexHandler(ctx, plot, client):
     embed.description = f"This will cost **${annexCost}** to annex. Are you sure?\n\nType `CONFIRM` to confirm"
     embed.color = discord.Color.teal()
     await ctx.send(embed=embed)
+
     def check(m):
         return m.author == ctx.author
+
     try:
         msg = await client.wait_for("message", check=check, timeout=30)
     except asyncio.TimeoutError:
@@ -125,6 +142,67 @@ async def annexHandler(ctx, plot, client):
     setTownData(townID, townData)
     embed.color = discord.Color.green()
     embed.description = "Plot annexed!"
+    await ctx.send(embed=embed)
+    return
+
+
+async def buildHandler(ctx, plot, structure, client):
+    plot = plot.upper()
+    embed = makeEmbed()
+    embed.color = discord.Color.red()
+    townID = getPlayerTown(ctx.author.id)
+    if townID == "NONE":
+        embed.description = "You are not in a town!"
+        await ctx.send(embed=embed)
+        return
+    if not plotIsValid(plot):
+        embed.description = "Invalid syntax! Syntax is `-plot build <structure> YX`, i.e. `-plot build mine C4`."
+        await ctx.send(embed=embed)
+        return
+    townData = getTownData(townID)
+    if not userOwnsPlot(ctx.author.id, townData, plot):
+        embed.description = "You don't own that plot!"
+        await ctx.send(embed=embed)
+        return
+    currentStructure = townData["PLOTS"][plot]["PLOTTYPE"]
+    if currentStructure != "PLAIN":
+        embed.description = f"There is already a {currentStructure.lower()} on that plot!"
+        await ctx.send(embed=embed)
+        return
+    playerData = getPlayerData(ctx.author.id)
+    structure = structure.upper()
+    structurePrice = calculateNextStructurePrice(playerData, structure)
+    if structurePrice == -1:
+        embed.description = "Invalid structure! Structures you can build are `mine`, `forest`, `farm`, and `pond`. Mayors can also build `house`."
+        await ctx.send(embed=embed)
+        return
+    if playerData["BALANCE"] < structurePrice:
+        embed.description = f"You Cannot afford that! The price to build a new **{structure.lower()}** is **${structurePrice}**."
+        await ctx.send(embed=embed)
+        return
+    embed.description = f"This will cost **${structurePrice}** to build. Are you sure?\n\nType `CONFIRM` to confirm"
+    embed.color = discord.Color.teal()
+    await ctx.send(embed=embed)
+
+    def check(m):
+        return m.author == ctx.author
+
+    try:
+        msg = await client.wait_for("message", check=check, timeout=30)
+    except asyncio.TimeoutError:
+        embed.description = "Build request timed out"
+        await ctx.send(embed=embed)
+        return
+    if msg.content.upper() != "CONFIRM":
+        embed.description = "Build request cancelled."
+        await ctx.send(embed=embed)
+        return
+    townData["PLOTS"][plot]["PLOTTYPE"] = structure
+    playerData["BALANCE"] -= structurePrice
+    playerData[structure + "S"] += 1
+    setTownData(townID, townData)
+    setPlayerData(ctx.author.id, playerData)
+    embed.description = f"{structure.capitalize()} built!"
     await ctx.send(embed=embed)
     return
 

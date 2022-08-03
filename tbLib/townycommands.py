@@ -65,4 +65,12 @@ async def plotCommandsHandler(ctx, args, client):
             await ctx.send(embed=embed)
             return
         await annexHandler(ctx, args[1], client)
+    if args[0] == "build":
+        if argsCount != 3:
+            embed = makeEmbed()
+            embed.description = "Invalid syntax! Syntax is `-plot build <structure> YX`, i.e. `-plot build mine C4`."
+            await ctx.send(embed=embed)
+            return
+        await buildHandler(ctx, args[2], args[1], client)
+
 
