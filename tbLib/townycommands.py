@@ -72,5 +72,9 @@ async def plotCommandsHandler(ctx, args, client):
             await ctx.send(embed=embed)
             return
         await buildHandler(ctx, args[2], args[1], client)
+    if args[0] == "clear":
+        if argsCount != 2:
+            embed = makeEmbed()
+            embed.description = "Invalid syntax! Syntax is `-plot info YX`, i.e. `-plot info C4`."
 
 

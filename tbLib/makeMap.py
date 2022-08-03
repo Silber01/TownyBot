@@ -9,7 +9,7 @@ def makeMap(townID):
         townData = json.load(readFile)
     for y in range(10):
         for x in range(10):
-            offset = (32 * (x + 1), 32 * (y + 1))
+            offset = (64 * (x + 1), 64 * (y + 1))
             removeColor = False
             tileID = chr(y + 65) + str(x)
             tileName = getTile(townData, tileID)
@@ -30,7 +30,7 @@ def makeOwnerMap(townID, resident):
         townData = json.load(readFile)
     for y in range(10):
         for x in range(10):
-            offset = (32 * (x + 1), 32 * (y + 1))
+            offset = (64 * (x + 1), 64 * (y + 1))
             removeColor = False
             darken = False
             tileID = chr(y + 65) + str(x)
@@ -56,7 +56,7 @@ def makeForSaleMap(townID):
         townData = json.load(readFile)
     for y in range(10):
         for x in range(10):
-            offset = (32 * (x + 1), 32 * (y + 1))
+            offset = (64 * (x + 1), 64 * (y + 1))
             removeColor = False
             darken = False
             tileID = chr(y + 65) + str(x)
@@ -83,6 +83,8 @@ def getTile(townData, tileID):
             return "plain1"
         elif randNum == 2:
             return "plain2"
+        elif randNum == 3:
+            return "plain3"
         else:
             return "plain"
     else:
