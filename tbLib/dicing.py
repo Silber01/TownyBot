@@ -92,22 +92,25 @@ async def diceHandler(ctx, receiver, dicesize, dices, winmethod, amount):
         return
     senderBal = getPlayerBalance(ctx.author.id)
     receiverBal = getPlayerBalance(receiverID)
-    amountCheck = isNumInLimits(amount, 1, min(senderBal, receiverBal))
-    if amountCheck == "NaN":                                    # check for if given amount is not a number
-        embed.description = "Amount is not a number!"
-        await ctx.send(embed=embed)
-        return
-    elif amountCheck == "LOW":                                  # check for if given amount is too low
-        embed.description = "You must bet at least $1"
-        await ctx.send(embed=embed)
-        return
-    elif amountCheck == "HIGH":                                 # check for if given amount is too high
-        if int(amount) > senderBal:                             # if sender cannot afford given amount, say sender cannot afford the bet. Else, say receiver cannot afford the bet
-            embed.description = "You cannot afford this!"
-        else:
-            embed.description = "Your opponent cannot afford this!"
-        await ctx.send(embed=embed)
-        return
+    if amount.lower() == "max":
+        amount = min(senderBal, receiverBal)
+    else:
+        amountCheck = isNumInLimits(amount, 1, min(senderBal, receiverBal))
+        if amountCheck == "NaN":                                    # check for if given amount is not a number
+            embed.description = "Amount is not a number!"
+            await ctx.send(embed=embed)
+            return
+        elif amountCheck == "LOW":                                  # check for if given amount is too low
+            embed.description = "You must bet at least $1"
+            await ctx.send(embed=embed)
+            return
+        elif amountCheck == "HIGH":                                 # check for if given amount is too high
+            if int(amount) > senderBal:                             # if sender cannot afford given amount, say sender cannot afford the bet. Else, say receiver cannot afford the bet
+                embed.description = "You cannot afford this!"
+            else:
+                embed.description = "Your opponent cannot afford this!"
+            await ctx.send(embed=embed)
+            return
     # after all checks, initialize given data into the dicereq dict to make a JSON file
     diceData["RECEIVER"] = receiverID
     diceData["DICESIZE"] = int(dicesize)

@@ -122,6 +122,14 @@ async def town(ctx, *args):
         argsAsList.append(arg)
     await townCommandsHandler(ctx, argsAsList, client)
 
+
+@client.command()
+async def t(ctx, *args):
+    argsAsList = []
+    for arg in args:
+        argsAsList.append(arg)
+    await townCommandsHandler(ctx, argsAsList, client)
+
 @client.command()
 async def plot(ctx, *args):
     argsAsList = []
@@ -184,12 +192,6 @@ async def guessNumber(ctx):
                 await ctx.send(f"Too high, {ctx.author.name}! Try again!")
             else:
                 await ctx.send(f"Correct, {ctx.author.name}! The number was {num}, and you got it in {guesses} guesses!")
-
-
-
-
-
-
 
 
 with open("non-code/key.txt", "r") as readFile:

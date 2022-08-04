@@ -63,7 +63,7 @@ def makeForSaleMap(townID):
             tileName = getTile(townData, tileID)
             if tileID not in townData["PLOTS"]:
                 removeColor = True
-            elif tileID not in townData["FORSALE"]:
+            elif tileName not in ["forsale", "houseforsale"]:
                 darken = True
             tile = Image.open(f"images/{tileName}.png")
             if removeColor:

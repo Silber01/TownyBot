@@ -21,7 +21,9 @@ mineTest = "MINE"
 forestText = "FOREST"
 farmText = "FARM"
 pondText = "POND"
-housesText = "HOUSES"
+houseText = "HOUSE"
+forsaleText = "FORSALE"
+houseforsaleText = "HOUSEFORSALE"
 
 
 async def townsHelp(ctx):
@@ -91,7 +93,7 @@ async def newTownHandler(ctx, name="NONE"):
     for plot in starterPlots:
         townData["PLOTS"][plot] = makePlot(playerID, plainText)
     housePlot = random.choice(starterPlots)
-    townData["PLOTS"][housePlot] = makePlot(playerID, housesText)
+    townData["PLOTS"][housePlot] = makePlot(playerID, houseText)
     townData["RESIDENTS"].append(playerID)
     setTownData(townID, townData)
     playerData["BALANCE"] -= townCost
@@ -117,6 +119,7 @@ async def deleteTownHandler(ctx, client):
 
     def check(m):
         return m.author == ctx.author
+
     try:
         msg = await client.wait_for("message", check=check, timeout=30)
     except asyncio.TimeoutError:
@@ -131,20 +134,36 @@ async def deleteTownHandler(ctx, client):
     townName = getTownName(townID)
     evicted = getTownData(townID)["RESIDENTS"]
     for user in evicted:
-        userData = getPlayerData(userID)
-        userData["TOWN"] = "NONE"
+        userData = getPlayerData(user)
+        userData["TOWN"] = None
         userData["PLOTS"] = 0
         userData["MINES"] = 0
         userData["FARMS"] = 0
         userData["FORESTS"] = 0
         userData["PONDS"] = 0
-        setPlayerData(userID, userData)
-        evicted.append(userData["NAME"] + "#" + userData["DISCRIMINATOR"])
+        setPlayerData(user, userData)
     os.remove(f"towns/{townID}.json")
     embed.description = f"{townName} has fallen! The following people are now homeless:\n"
     for user in evicted:
-        embed.description += user + "\n"
+        embed.description += getFullName(user) + "\n"
     await ctx.send(embed=embed)
+
+
+async def renameHandler(ctx, name):
+    embed = makeEmbed()
+    if not isMayor:
+        embed.description = "You don't own a town!"
+        embed.color = discord.Color.red()
+        await ctx.send(embed=embed)
+        return
+    townID = getPlayerTown(ctx.author.id)
+    townData = getTownData(townID)
+    townData["NAME"] = name
+    setTownData(townID, townData)
+    embed.description = "Town renamed!"
+    embed.color = discord.Color.green()
+    await ctx.send(embed=embed)
+    return
 
 
 async def makeMapHandler(ctx, town="NONE"):
