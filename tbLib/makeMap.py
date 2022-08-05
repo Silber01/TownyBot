@@ -77,15 +77,16 @@ def makeForSaleMap(townID):
 
 
 def getTile(townData, tileID):
-    if tileID not in townData["PLOTS"]:  # Plot not owned by town, pick a random plains tile
-        randNum = random.randint(0, 10)
-        if randNum == 1:
-            return "plain1"
-        elif randNum == 2:
-            return "plain2"
-        elif randNum == 3:
-            return "plain3"
-        else:
-            return "plain"
-    else:
-        return townData["PLOTS"][tileID]["PLOTTYPE"].lower()
+    tileTypes = {
+        "PLAIN": ["plain", "plain", "plain", "plain", "plain", "plain", "plain", "plain3", "plain3", "plain3", "plain2", "plain1"],
+        "MINE": ["mine"],
+        "FOREST": ["forest"],
+        "FARM": ["farm1", "farm2"],
+        "POND": ["pond1", "pond2", "pond3"],
+        "HOUSE": ["house"],
+        "FORSALE": ["forsale"],
+        "HOUSEFORSALE": ["houseforsale"]
+    }
+    if tileID not in townData["PLOTS"]:
+        return random.choice(tileTypes["PLAIN"])
+    return random.choice(tileTypes[townData["PLOTS"][tileID]["PLOTTYPE"]])
