@@ -37,3 +37,11 @@ def getTownData(townID):
 def setTownData(townID, townData):
     with open(f"towns/{townID}.json", "w") as write_file:
         json.dump(townData, write_file)
+
+
+def getHouseForSale(townID):
+    townData = getTownData(townID)
+    for plot in townData["PLOTS"]:
+        if townData["PLOTS"][plot]["PLOTTYPE"] == "HOUSEFORSALE":
+            return plot
+    return None

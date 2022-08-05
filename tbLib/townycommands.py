@@ -1,6 +1,6 @@
 from tbLib.towns import *
 from tbLib.plots import *
-
+from tbLib.towninvites import *
 
 async def townCommandsHandler(ctx, args, client):
     argsCount = len(args)
@@ -55,6 +55,18 @@ async def townCommandsHandler(ctx, args, client):
         else:
             await makeForSaleMapHandler(ctx, args[1])
         return
+    if args[0] == "invite":
+        if argsCount != 2:
+            embed = makeEmbed()
+            embed.description = "Invalid syntax! Syntax is `-town invite <player>`"
+            await ctx.send(embed=embed)
+            return
+        await inviteHandler(ctx, args[1])
+        return
+    if args[0] == "deny":
+        await invDenyHandler(ctx)
+    if args[0] == "accept":
+        await invAcceptHandler(ctx)
     if args[0] in ["annex", "build", "clear"]:
         await plotCommandsHandler(ctx, args, client)
         return

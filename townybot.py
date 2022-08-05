@@ -15,6 +15,7 @@ from tbLib.pay import payHandler
 from tbLib.townycommands import townCommandsHandler, plotCommandsHandler
 from tbLib.playerData import *
 from tbLib.plots import plotInfo
+from tbLib.towninvites import deqTownTTLs
 
 client = commands.Bot(command_prefix='-', help_command=None)  # sets prefix and deletes default help command
 
@@ -27,6 +28,7 @@ async def on_ready():
     while True:
         await asyncio.sleep(5)
         await deqDiceTTLs(client, 5)
+        await deqTownTTLs(client, 5)
 
 
 @client.before_invoke

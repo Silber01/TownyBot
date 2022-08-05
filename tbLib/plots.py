@@ -264,14 +264,19 @@ async def clearHandler(ctx, plot):
         await ctx.send(embed=embed)
         return
     currentStructure = townData["PLOTS"][plot]["PLOTTYPE"]
-    if currentStructure not in [mineText, forestText, farmText, pondText]:
+    if currentStructure not in [mineText, forestText, farmText, pondText, houseText]:
         embed.description = "This plot is already cleared!"
         await ctx.send(embed=embed)
         return
-    townData["PLOTS"][plot]["PLOTTYPE"] = plainText
     playerID = str(ctx.author.id)
+    if currentStructure == houseText and countHousesOwned(playerID) <= 1:
+        embed.description = "You cannot clear your only house!"
+        await ctx.send(embed=embed)
+        return
+    townData["PLOTS"][plot]["PLOTTYPE"] = plainText
     playerData = getPlayerData(playerID)
-    playerData[currentStructure + "S"] -= 1
+    if currentStructure in [mineText, forestText, farmText, pondText]:
+        playerData[currentStructure + "S"] -= 1
     setPlayerData(playerID, playerData)
     setTownData(townID, townData)
     embed.description = "Plot cleared!"
