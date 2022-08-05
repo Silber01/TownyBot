@@ -73,7 +73,7 @@ def userOwnsPlot(userID, townData, plot):
 
 
 def structureIsValid(structure):
-    if structure in [mineText, forestText, farmText, pondText]:
+    if structure in [mineText, forestText, farmText, pondText, houseText]:
         return True
     return False
 
@@ -355,3 +355,86 @@ async def notforsaleHandler(ctx, plot):
     embed.color = discord.Color.green()
     await ctx.send(embed=embed)
     return
+
+
+async def buyHandler(ctx, plot):
+    playerID = str(ctx.author.id)
+    if not await isInTown(ctx):
+        return
+    plot = plot.upper()
+    embed = makeEmbed()
+    if not plotIsValid(plot):
+        embed.description = "Invalid syntax! Syntax is `-plot buy YX`, i.e. `-plot buy C4`."
+        await ctx.send(embed=embed)
+        return
+    townID = getPlayerTown(playerID)
+    townData = getTownData(townID)
+    plotType = townData["PLOTS"][plot]["PLOTTYPE"]
+    if plotType not in [forsaleText, houseforsaleText]:
+        embed.description = "This plot is not for sale!"
+        await ctx.send(embed=embed)
+        return
+    plotPrice = townData["PLOTPRICE"]
+    playerData = getPlayerData(playerID)
+    if playerData["BALANCE"] < plotPrice:
+        embed.description = f"You cannot afford to buy this plot! Plots cost **${plotPrice}** in this town."
+        await ctx.send(embed=embed)
+        return
+    townData["PLOTS"][plot]["OWNER"] = playerID
+    if plotType == forsaleText:
+        townData["PLOTS"][plot]["PLOTTYPE"] = plainText
+    else:
+        townData["PLOTS"][plot]["PLOTTYPE"] = houseText
+    setTownData(townID, townData)
+    mayorID = townData["MAYOR"]
+    mayorData = getPlayerData(mayorID)
+    mayorData["BALANCE"] += plotPrice
+    setPlayerData(mayorID, mayorData)
+    playerData["BALANCE"] -= plotPrice
+    playerData["PLOTS"] += 1
+    setPlayerData(playerID, playerData)
+    embed.description = f"You now own this plot! You paid **${plotPrice}** for this plot."
+    embed.color = discord.Color.green()
+    await ctx.send(embed=embed)
+    return
+
+
+async def unclaimHandler(ctx, plot):
+    playerID = str(ctx.author.id)
+    if not await isInTown(ctx):
+        return
+    plot = plot.upper()
+    embed = makeEmbed()
+    if not plotIsValid(plot):
+        embed.description = "Invalid syntax! Syntax is `-plot unclaim YX`, i.e. `-plot unclaim C4`."
+        await ctx.send(embed=embed)
+        return
+    townID = getPlayerTown(playerID)
+    townData = getTownData(townID)
+    if not userOwnsPlot(playerID, townData, plot):
+        embed.description = "You do not own that plot!"
+        await ctx.send(embed=embed)
+        return
+    structureType = townData["PLOTS"][plot]["PLOTTYPE"]
+    if structureType == houseText and countHousesOwned(playerID) <= 1:
+        embed.description = "You cannot unclaim your only house!"
+        await ctx.send(embed=embed)
+        return
+    if isMayor(playerID):
+        embed.description = "You own the town, so you can't unclaim your own plots! You can remove plots from your town with `-plot abandon YX`."
+        await ctx.send(embed=embed)
+        return
+    playerData = getPlayerData(playerID)
+    if structureType in ["MINE", "FOREST", "FARM", "POND"]:
+        playerData[structureType + "S"] -= 1
+    playerData["PLOTS"] -= 1
+    setPlayerData(playerID, playerData)
+    mayorID = townData["MAYOR"]
+    townData["PLOTS"][plot]["OWNER"] = mayorID
+    if structureType != houseText:
+        townData["PLOTS"][plot]["PLOTTYPE"] = plainText
+    setTownData(townID, townData)
+    embed.description = "Plot unclaimed!"
+    await ctx.send(embed=embed)
+    return
+

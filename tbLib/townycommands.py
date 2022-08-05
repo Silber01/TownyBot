@@ -110,6 +110,21 @@ async def plotCommandsHandler(ctx, args, client):
             return
         await notforsaleHandler(ctx, args[1])
         return
+    if args[0] == "buy":
+        if argsCount != 2:
+            embed = makeEmbed()
+            embed.description = "Invalid syntax! Syntax is `-plot buy YX`, i.e. `-plot buy C4`."
+            await ctx.send(embed=embed)
+            return
+        await buyHandler(ctx, args[1])
+        return
+    if args[0] == "unclaim":
+        if argsCount != 2:
+            embed = makeEmbed()
+            embed.description = "Invalid syntax! Syntax is `-plot unclaim YX`, i.e. `-plot unclaim C4`."
+            await ctx.send(embed=embed)
+            return
+        await unclaimHandler(ctx, args[1])
     if args[0] in ["map", "ownedplots"]:
         await townCommandsHandler(ctx, args, client)
         return

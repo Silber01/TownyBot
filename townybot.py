@@ -37,7 +37,7 @@ async def common(ctx):
             playerData = json.load(read_file)
         playerData["NAME"] = ctx.author.name
         playerData["DISCRIMINATOR"] = ctx.author.discriminator
-        playerData["TOWN"] = generateName()
+        playerData["TOWN"] = None
         with open(f"players/{userID}.json", "w") as write_file:
             json.dump(playerData, write_file)
         return
