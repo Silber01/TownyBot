@@ -1,6 +1,28 @@
 from PIL import Image, ImageEnhance
 import json
 import random
+import discord
+from tbLib.playerData import *
+from tbLib.townsData import *
+from tbLib.makeEmbed import makeEmbed
+
+
+async def getMap(ctx, arg, mapType):
+    if arg == "NONE":
+        townID = getPlayerTown(ctx.author.id)
+    else:
+        townID = findTownID(arg)
+    if townID is None:
+        embed = makeEmbed()
+        embed.description = "This town doesn't exist!"
+        embed.color = discord.Color.red()
+        await ctx.send(embed=embed)
+        return None
+    if mapType == "MAP":
+        townFile = makeMap(townID)
+    else:
+        townFile = makeForSaleMap(townID)
+    return townFile
 
 
 def makeMap(townID):

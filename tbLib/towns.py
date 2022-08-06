@@ -11,7 +11,7 @@ from tbLib.playerData import *
 from tbLib.makeEmbed import makeEmbed
 from tbLib.nameGenerator import generateName
 from tbLib.townsData import *
-from tbLib.makeMap import makeForSaleMap, makeOwnerMap, makeMap
+from tbLib.makeMap import makeForSaleMap, makeOwnerMap, makeMap, getMap
 from tbLib.identifier import identify, getFullName
 from tbLib.plots import makePlot, calculateNextPlot
 
@@ -169,37 +169,79 @@ async def renameHandler(ctx, name):
 async def makeMapHandler(ctx, town="NONE"):
     if not await canMakeMap(ctx):
         return
-    if town == "NONE":
-        townID = getPlayerTown(ctx.author.id)
-    else:
-        townID = findTownID(town)
-    if townID is None:
-        embed = makeEmbed()
-        embed.description = "This town doesn't exist!"
-        embed.color = discord.Color.red()
-        await ctx.send(embed=embed)
+    townFile = await getMap(ctx, town, "MAP")
+    if townFile is None:
         return
-    townFile = makeMap(townID)
     await ctx.send(file=discord.File(townFile))
-    os.remove(townFile)
+    os.remove(str(townFile))
 
 
 async def makeForSaleMapHandler(ctx, town="NONE"):
     if not await canMakeMap(ctx):
         return
-    if town == "NONE":
-        townID = getPlayerTown(ctx.author.id)
-    else:
-        townID = findTownID(town)
+    townFile = await getMap(ctx, town, "FORSALE")
+    if townFile is None:
+        return
+    await ctx.send(file=discord.File(townFile))
+    os.remove(str(townFile))
+
+
+async def leaveHandler(ctx, client):
+    embed = makeEmbed()
+    embed.color = discord.Color.red()
+    playerID = str(ctx.author.id)
+    townID = getPlayerTown(playerID)
     if townID is None:
-        embed = makeEmbed()
-        embed.description = "This town doesn't exist!"
-        embed.color = discord.Color.red()
+        embed.description = "You are already not in a town!"
         await ctx.send(embed=embed)
         return
-    townFile = makeForSaleMap(townID)
-    await ctx.send(file=discord.File(townFile))
-    os.remove(townFile)
+    if isMayor(playerID):
+        embed.description = "You cannot leave a town you own! Appoint another mayor using `-town set mayor` or delete the town using `-town delete`."
+        await ctx.send(embed=embed)
+        return
+    embed.description = """Are you sure you want to leave your town? Your plots will be gone forever!\n\nType `CONFIRM` to confirm"""
+    await ctx.send(embed=embed)
+
+    def check(m):
+        return m.author == ctx.author
+
+    try:
+        msg = await client.wait_for("message", check=check, timeout=30)
+    except asyncio.TimeoutError:
+        embed.description = "Town leave request timed out."
+        await ctx.send(embed=embed)
+        return
+    if msg.content.upper() != "CONFIRM":
+        embed.description = "Town leave request cancelled."
+        await ctx.send(embed=embed)
+        return
+    clearUserLand(ctx)
+    embed.description = "You left town."
+    await ctx.send(embed=embed)
+
+
+def clearUserLand(ctx):
+    playerID = str(ctx.author.id)
+    playerData = getPlayerData(playerID)
+    playerData["TOWN"] = None
+    playerData["PLOTS"] = 0
+    playerData["MINES"] = 0
+    playerData["FORESTS"] = 0
+    playerData["FARMS"] = 0
+    playerData["PONDS"] = 0
+    townID = getPlayerTown(playerID)
+    townData = getTownData(townID)
+    mayorID = townData["MAYOR"]
+    townData["RESIDENTS"].remove(playerID)
+    for plot in townData["PLOTS"]:
+        if townData["PLOTS"][plot]["OWNER"] == playerID:
+            plotInfo = townData["PLOTS"][plot]
+            plotInfo["OWNER"] = mayorID
+            if plotInfo["PLOTTYPE"] not in [houseText, plainText]:
+                plotInfo["PLOTTYPE"] = plainText
+            townData["PLOTS"][plot] = plotInfo
+    setTownData(townID, townData)
+    setPlayerData(playerID, playerData)
 
 
 async def makeOwnerMapHandler(ctx, resident="NONE"):
