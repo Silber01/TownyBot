@@ -67,6 +67,8 @@ async def townCommandsHandler(ctx, args, client):
         await invDenyHandler(ctx)
     if args[0] == "accept":
         await invAcceptHandler(ctx)
+    if args[0] == "leave":
+        await leaveHandler(ctx, client)
     if args[0] in ["annex", "build", "clear"]:
         await plotCommandsHandler(ctx, args, client)
         return
