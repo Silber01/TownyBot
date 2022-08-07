@@ -5,6 +5,7 @@ from tbLib.townsData import *
 from tbLib.identifier import *
 from tbLib.makeEmbed import makeEmbed
 from tbLib.tbutils import warnUser
+from tbLib.validPlotDelete import canRemovePlot
 
 houseCost = 1000
 plainText = "PLAIN"
@@ -222,6 +223,48 @@ async def buildHandler(ctx, plot, structure, client):
     return
 
 
+async def abandonHandler(ctx, client, plot):
+    embed = makeEmbed()
+    embed.color = discord.Color.red()
+    plot = plot.upper()
+    playerID = str(ctx.author.id)
+    if not isMayor(playerID):
+        embed.description = "Only the mayor can abandon plots!"
+        await ctx.send(embed=embed)
+        return
+    if not plotIsValid(plot):
+        embed.description = "Invalid Syntax! Syntax is `-plot abandon YX` i.e. `-plot abandon C4`."
+        await ctx.send(embed=embed)
+        return
+    townID = getPlayerTown(playerID)
+    townData = getTownData(townID)
+    if not userOwnsPlot(playerID, townData, plot):
+        embed.description = "You need to own this plot in order to abandon it!"
+        await ctx.send(embed=embed)
+        return
+    if townData["PLOTS"][plot]["PLOTTYPE"] != plainText:
+        embed.description = f"This plot needs to be clear before you abandon it! DO `-plot clear {plot}` first."
+        await ctx.send(embed=embed)
+        return
+    if not canRemovePlot(townData["PLOTS"], plot):
+        embed.description = f"Removing this plot will split the town apart! You can't do that!"
+        await ctx.send(embed=embed)
+        return
+    warnText = f"Are you sure you want to remove this plot?\n\nType `CONFIRM` to confirm"
+    timeOutText = "Abandon request timed out"
+    cancelMsg = "Abandon request cancelled."
+    if not await warnUser(ctx, client, warnText, cancelMsg, timeOutText, 30, "CONFIRM"):
+        return
+    del townData["PLOTS"][plot]
+    setTownData(townID, townData)
+    mayorData = getPlayerData(playerID)
+    mayorData["PLOTS"] -= 1
+    setPlayerData(playerID, mayorData)
+    embed.color = embed.color.green()
+    embed.description = "Plot abandoned."
+    await ctx.send(embed=embed)
+
+
 async def clearHandler(ctx, plot):
     if not await isInTown(ctx):
         return
@@ -274,7 +317,6 @@ async def forsaleHandler(ctx, plot):
         embed.description = "Invalid syntax! Syntax is `-plot forsale YX`, i.e. `-plot forsale C4`."
         await ctx.send(embed=embed)
         return
-
     townID = getPlayerTown(playerID)
     townData = getTownData(townID)
     if not userOwnsPlot(playerID, townData, plot):
@@ -417,4 +459,3 @@ async def unclaimHandler(ctx, plot):
     embed.description = "Plot unclaimed!"
     await ctx.send(embed=embed)
     return
-

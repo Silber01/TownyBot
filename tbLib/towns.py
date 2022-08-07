@@ -1,6 +1,4 @@
-import asyncio
-import os
-import json
+import math
 import random
 import time
 
@@ -11,10 +9,10 @@ from tbLib.playerData import *
 from tbLib.makeEmbed import makeEmbed
 from tbLib.nameGenerator import generateName
 from tbLib.townsData import *
-from tbLib.makeMap import makeForSaleMap, makeOwnerMap, makeMap, getMap
+from tbLib.makeMap import makeOwnerMap, getMap
 from tbLib.identifier import identify, getFullName
 from tbLib.plots import makePlot, calculateNextPlot
-from tbLib.tbutils import warnUser
+from tbLib.tbutils import warnUser, isNumInLimits
 
 townCost = 25000
 plainText = "PLAIN"
@@ -28,7 +26,7 @@ houseforsaleText = "HOUSEFORSALE"
 
 
 async def townsHelp(ctx):
-    await ctx.send("I'll implement this help screen later")
+    await townInfoHandler(ctx)
 
 
 async def townInfoHandler(ctx, name="NONE"):
@@ -100,6 +98,7 @@ async def newTownHandler(ctx, client, name="NONE"):
     housePlot = random.choice(starterPlots)
     townData["PLOTS"][housePlot] = makePlot(playerID, houseText)
     townData["RESIDENTS"].append(playerID)
+    townData["TIMEMADE"] = int(time.time())
     setTownData(townID, townData)
     playerData["BALANCE"] -= townCost
     playerData["TOWN"] = townID
@@ -257,7 +256,67 @@ def clearUserLand(playerID):
 
 
 async def plotPriceHandler(ctx, value):
-    print("implement later")
+    embed = makeEmbed()
+    embed.color = discord.Color.red()
+    playerID = str(ctx.author.id)
+    if not isMayor(playerID):
+        embed.description = "You need to own a town to change the plot price!"
+        await ctx.send(embed=embed)
+        return
+    valueCheck = isNumInLimits(value, 0, 1000000)
+    if valueCheck == "NaN":
+        embed.description = "Invalid syntax! Syntax is `-town set plotprice <number>`."
+        await ctx.send(embed=embed)
+        return
+    if valueCheck == "LOW":
+        embed.description = "Plot price must be at least **$0**."
+        await ctx.send(embed=embed)
+        return
+    if valueCheck == "HIGH":
+        embed.description = "Plot price must be at most **$1,000,000**."
+        await ctx.send(embed=embed)
+        return
+    townID = getPlayerTown(playerID)
+    townData = getTownData(townID)
+    townData["PLOTPRICE"] = int(value)
+    setTownData(townID, townData)
+    embed.color = discord.Color.green()
+    embed.description = f"Plots now cost **${value}** to buy."
+    await ctx.send(embed=embed)
+
+
+async def newMayorHandler(ctx, newMayor, client):
+    embed = makeEmbed()
+    embed.color = discord.Color.red()
+    playerID = str(ctx.author.id)
+    if not isMayor(playerID):
+        embed.description = "You need to own a town to change the plot price!"
+        await ctx.send(embed=embed)
+        return
+    newMayorID = identify(newMayor)
+    if newMayorID.startswith("ERROR"):
+        embed.description = newMayorID.replace("ERROR ", "")
+        await ctx.send(embed=embed)
+        return
+    townID = getPlayerTown(playerID)
+    townData = getTownData(townID)
+    if newMayorID not in townData["RESIDENTS"]:
+        embed.description = f"{getFullName(newMayorID)} is not in your town!"
+        await ctx.send(embed=embed)
+        return
+    warnText = f"""Are you sure you want to give this town to **{getFullName(newMayorID)}**?
+                \n\nType `CONFIRM` to confirm."""
+    timeOutText = "Town set mayor request timed out."
+    cancelMsg = "Town set mayor request cancelled."
+    if not await warnUser(ctx, client, warnText, cancelMsg, timeOutText, 30, "CONFIRM"):
+        return
+    townData["MAYOR"] = newMayorID
+    setTownData(townID, townData)
+    embed.color = discord.Color.green()
+    embed.description = f"**{getFullName(newMayorID)}** is now the new mayor!"
+    await ctx.send(embed=embed)
+
+
 
 async def makeOwnerMapHandler(ctx, resident="NONE"):
     if not await canMakeMap(ctx):
@@ -297,3 +356,42 @@ async def canMakeMap(ctx):
     playerData["LASTMAP"] = int(time.time())
     setPlayerData(ctx.author.id, playerData)
     return True
+
+
+async def townListHandler(ctx, page=1):
+    embed = makeEmbed()
+    valueCheck = isNumInLimits(page, 1, math.inf)
+    if valueCheck == "NaN":
+        embed.description = "Invalid syntax! Syntax is `-town list <page>`."
+        await ctx.send(embed=embed)
+        return
+    if valueCheck == "LOW":
+        embed.description = "page must be at least **1**."
+        await ctx.send(embed=embed)
+        return
+    towns = {}
+    for town in os.listdir("towns"):                                          # iterates through all users and adds full name and balance to users
+        townID = town.replace(".json", "")
+        townData = getTownData(townID)
+        townName = townData["NAME"]
+        timeMade = townData["TIMEMADE"]
+        towns[townName] = timeMade
+    sortedTowns = sorted(towns.items(), key=lambda x: x[1])  # sorts users by values and stores result in sortedUsers
+    print(sortedTowns)
+    embed = makeEmbed()
+    embed.description = "**__Towns List:__**\n"
+    place = 0  # iterator for placement of user
+    pageSize = 10  # determines how many people fit on one page
+    startPlace = (int(page) - 1) * pageSize  # determines where to start by given page value
+    leaderboard = []  # initializes empty list for users to be put in
+    for town in sortedTowns:  # iterates through all users
+        print(town[0])
+        if startPlace <= place < startPlace + pageSize:  # checks if place is within bounds of the page requested
+            townStats = f"{place + 1}. **{town[0]}**"  # adds full name and balance to leaderboard
+            leaderboard.append(townStats)
+        place += 1
+    for town in leaderboard:  # adds users to the description
+        embed.description += "\n" + town
+    embed.color = discord.Color.purple()
+    await ctx.send(embed=embed)
+

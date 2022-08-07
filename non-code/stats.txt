@@ -1,9 +1,14 @@
-**__Stats for USERNAME:__**
+**__Stats for {username}:__**
 
-**Balance**: $BALANCE
-**Town**: TOWN
+Balance: **${balance}**
+Town: **{town}**
 
-**Mining Level**: MINELVL
-**Woodcutting Level**: WOODLVL
-**Farming Level**: FARMINGLVL
-**Fishing Level**: FISHINGLVL
+Mining Level: **{minelvl}**
+Woodcutting Level: **{woodlvl}**
+Farming Level: **{farminglvl}**
+Fishing Level: **{fishinglvl}**
+
+Mines: **{mines}**
+Forests: **{forests}**
+Farms: **{farms}**
+Ponds: **{ponds}**
