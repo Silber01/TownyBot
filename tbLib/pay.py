@@ -2,9 +2,10 @@ import json
 import os
 import discord
 
-from tbLib.identifier import identify, getFullName, isNumInLimits
+from tbLib.identifier import identify, getFullName
 from tbLib.makeEmbed import makeEmbed
 from tbLib.playerData import *
+from tbLib.tbutils import isNumInLimits
 
 # handles pay command
 async def payHandler(ctx, person, amount):
@@ -30,7 +31,8 @@ async def payHandler(ctx, person, amount):
         embed.description = "You cannot afford to do that!"
         await ctx.send(embed=embed)
         return
-    embed.description = f"{getFullName(senderID)} has successfully paid {getFullName(receiverID)} **${amount}**."
+    embed.description = f"**{getFullName(senderID)}** has successfully paid **{getFullName(receiverID)}** **${amount}**."
+    embed.color = discord.Color.green()
     await ctx.send(embed=embed)
     receiverData = getPlayerData(receiverID)                        # fetches receiver data
     senderData["BALANCE"] -= int(amount)                            # deducts money from sender

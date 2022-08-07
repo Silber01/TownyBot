@@ -56,14 +56,4 @@ def getFullName(id):
     return playerData["NAME"] + "#" + playerData["DISCRIMINATOR"]
 
 
-# given a number, low, and high, determines if number is valid, not a number, too low, or too high
-def isNumInLimits(number, low, high):
-    try:
-        value = int(number)
-    except ValueError:
-        return "NaN"
-    if value < low:
-        return "LOW"
-    if value > high:
-        return "HIGH"
-    return "VALID"
+

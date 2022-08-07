@@ -50,16 +50,15 @@ async def townInfoHandler(ctx, name="NONE"):
     townData = getTownData(townID)
     townName = townData["NAME"]
     townMayor = townData["MAYOR"]
-    townTax = townData["PLOTTAX"]
     plotPrice = townData["PLOTPRICE"]
     townSize = len(townData["PLOTS"])
     residents = []
     for resident in townData["RESIDENTS"]:
-        residents.append(getPlayerData(resident)["NAME"])
+        residents.append("**" + getPlayerData(resident)["NAME"] + "**")
     embed.color = discord.Color.purple()
-    embed.description = f"""Information for **{townName}**:\n\nMayor: **{getFullName(townMayor)}**\nAmount of plots: **{townSize}**\nResidents: {str(residents)[1:-1].replace("'", "")}\n\n
-                            Taxes per plot owned: **${townTax}**/day\nPrice to own a plot: **${plotPrice}**
-                            \nPrice to annex a plot: **${calculateNextPlot(townSize)}**
+    embed.description = f"""Information for **{townName}**:\n\nMayor: **{getFullName(townMayor)}**\n
+                            Amount of plots: **{townSize}**\n\nResidents: {str(residents)[1:-1].replace("'", "")}\n
+                            \nPrice to own a plot: **${plotPrice}**\nPrice to annex a plot: **${calculateNextPlot(townSize)}**
                             \n\nDo `-town map {townName}` to see a map of this town!"""
     await ctx.send(embed=embed)
 
@@ -256,6 +255,9 @@ def clearUserLand(playerID):
     setTownData(townID, townData)
     setPlayerData(playerID, playerData)
 
+
+async def plotPriceHandler(ctx, value):
+    print("implement later")
 
 async def makeOwnerMapHandler(ctx, resident="NONE"):
     if not await canMakeMap(ctx):
