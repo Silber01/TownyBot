@@ -76,6 +76,38 @@ async def townCommandsHandler(ctx, args, client):
             await ctx.send(embed=embed)
             return
         await kickHandler(ctx, client, args[1])
+    if args[0] == "set":
+        if argsCount < 2:
+            embed = makeEmbed()
+            embed.description = """Invalid syntax! Possible commands for `-town set` are 
+                                `-town set mayor <new mayor>`, or `-town set plotprice <plot price>`."""
+            await ctx.send(embed=embed)
+        if args[1] not in ["plotprice", "mayor"]:
+            embed = makeEmbed()
+            embed.description = """Invalid syntax! Possible commands for `-town set` are 
+                                           `-town set mayor <new mayor>`, or `-town set plotprice <plot price>`."""
+            await ctx.send(embed=embed)
+        if args[1] == "plotprice":
+            if argsCount != 3:
+                embed = makeEmbed()
+                embed.description = "Invalid syntax! Syntax is `-plot set plotprice <plot price>`."
+                await ctx.send(embed=embed)
+                return
+            await plotPriceHandler(ctx, args[2])
+        if args[1] == "mayor":
+            if argsCount != 3:
+                embed = makeEmbed()
+                embed.description = "Invalid syntax! Syntax is `-plot set mayor <new mayor>`."
+                await ctx.send(embed=embed)
+                return
+            await newMayorHandler(ctx, args[2], client)
+    if args[0] == "list":
+        if argsCount == 1:
+            await townListHandler(ctx)
+            return
+        await townListHandler(ctx, args[1])
+        return
+
     if args[0] in ["annex", "build", "clear"]:
         await plotCommandsHandler(ctx, args, client)
         return
@@ -99,6 +131,13 @@ async def plotCommandsHandler(ctx, args, client):
             return
         await annexHandler(ctx, args[1], client)
         return
+    if args[0] == "abandon":
+        if argsCount != 2:
+            embed = makeEmbed()
+            embed.description = "Invalid syntax! Syntax is `-plot abandon YX`, i.e. `-plot abandon C4`."
+            await ctx.send(embed=embed)
+            return
+        await abandonHandler(ctx, client, args[1])
     if args[0] == "build":
         if argsCount != 3:
             embed = makeEmbed()

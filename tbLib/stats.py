@@ -19,14 +19,13 @@ async def statsHandler(ctx, name):
     with open("non-code/stats.txt") as read_file:                               # fetches stats.txt
         statsMsg = read_file.read()
     # replace various keywords with wanted values
-    statsMsg = statsMsg.replace("USERNAME", userData["NAME"])
-    statsMsg = statsMsg.replace("BALANCE", str(userData["BALANCE"]))
-    statsMsg = statsMsg.replace("TOWN", str(getTownName(userData["TOWN"])))
-    statsMsg = statsMsg.replace("MINELVL", str(userData["MINELVL"]))
-    statsMsg = statsMsg.replace("WOODLVL", str(userData["WOODLVL"]))
-    statsMsg = statsMsg.replace("FARMINGLVL", str(userData["FARMLVL"]))
-    statsMsg = statsMsg.replace("FISHINGLVL", str(userData["FISHLVL"]))
+    statsMsg = statsMsg.format(username=userData["NAME"], balance=userData["BALANCE"], town=getTownName(userData["TOWN"]),
+                               minelvl=userData["MINELVL"], woodlvl=userData["WOODLVL"],
+                               farminglvl=userData["FARMLVL"], fishinglvl=userData["FISHLVL"],
+                               mines=userData["MINES"], forests=userData["FORESTS"],
+                               farms=userData["FARMS"], ponds=userData["PONDS"])
     embed.description = statsMsg
+    embed.color = discord.Color.purple()
     await ctx.send(embed=embed)
 
 
@@ -40,6 +39,7 @@ async def balanceHandler(ctx, name):
     username = userData["NAME"]
     balance = userData["BALANCE"]
     embed.description = f"**{username}'s balance**: ${balance}"
+    embed.color = discord.Color.purple()
     await ctx.send(embed=embed)
 
 
@@ -66,6 +66,7 @@ async def levelsHandler(ctx, name):
     levelsMsg = levelsMsg.replace("FARMREQXP", str(calculateNextLevel(userData["FARMLVL"])))
     levelsMsg = levelsMsg.replace("FISHREQXP", str(calculateNextLevel(userData["FISHLVL"])))
     embed.description = levelsMsg
+    embed.color = discord.Color.purple()
     await ctx.send(embed=embed)
 
 
@@ -97,6 +98,7 @@ async def baltopHandler(ctx, page):
         embed.description += "\n" + user[0] + ": $" + str(user[1])
 
     embed.set_footer(text="You are in position #" + str(authorPos))         # shows player's position
+    embed.color = discord.Color.purple()
     await ctx.send(embed=embed)
 
 
