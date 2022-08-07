@@ -69,6 +69,13 @@ async def townCommandsHandler(ctx, args, client):
         await invAcceptHandler(ctx)
     if args[0] == "leave":
         await leaveHandler(ctx, client)
+    if args[0] == "kick":
+        if argsCount != 2:
+            embed = makeEmbed()
+            embed.description = "Invalid syntax! Syntax is `-town kick <player>`"
+            await ctx.send(embed=embed)
+            return
+        await kickHandler(ctx, client, args[1])
     if args[0] in ["annex", "build", "clear"]:
         await plotCommandsHandler(ctx, args, client)
         return

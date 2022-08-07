@@ -199,13 +199,42 @@ async def leaveHandler(ctx, client):
     cancelMsg = "Town leave request cancelled."
     if not await warnUser(ctx, client, warnText, cancelMsg, timeOutText, 30, "CONFIRM"):
         return
-    clearUserLand(ctx)
+    clearUserLand(playerID)
     embed.description = "You left town."
     await ctx.send(embed=embed)
 
 
-def clearUserLand(ctx):
-    playerID = str(ctx.author.id)
+async def kickHandler(ctx, client, resident):
+    embed = makeEmbed()
+    embed.color = discord.Color.red()
+    mayorID = str(ctx.author.id)
+    if not isMayor(mayorID):
+        embed.description = "You do not own a town!"
+        await ctx.send(embed=embed)
+        return
+    residentID = identify(resident)
+    if residentID.startswith("ERROR"):
+        embed.description = residentID.replace("ERROR ", "")
+        await ctx.send(embed=embed)
+        return
+    townID = getPlayerTown(mayorID)
+    townData = getTownData(townID)
+    if residentID not in townData["RESIDENTS"]:
+        embed.description = f"**{getFullName(residentID)}** is not in your town!"
+        await ctx.send(embed=embed)
+        return
+    warnText = f"""Are you sure you want to kick **{getFullName(residentID)}**? They will lose all their plots and structures!
+                    \n\nType `CONFIRM` to confirm\n\nWARNING: Their plots will all be wiped"""
+    timeOutText = "Town leave request timed out."
+    cancelMsg = "Town leave request cancelled."
+    if not await warnUser(ctx, client, warnText, cancelMsg, timeOutText, 30, "CONFIRM"):
+        return
+    clearUserLand(residentID)
+    embed.description = f"**{getFullName(residentID)}** was kicked."
+    await ctx.send(embed=embed)
+
+
+def clearUserLand(playerID):
     playerData = getPlayerData(playerID)
     playerData["TOWN"] = None
     playerData["PLOTS"] = 0

@@ -153,7 +153,7 @@ async def annexHandler(ctx, plot, client):
         embed.description = f"You cannot afford this! A new plot will cost **${annexCost}**."
         await ctx.send(embed=embed)
         return
-    warnText =  f"This will cost **${annexCost}** to annex. Are you sure?\n\nType `CONFIRM` to confirm"
+    warnText = f"This will cost **${annexCost}** to annex. Are you sure?\n\nType `CONFIRM` to confirm"
     timeOutText = "Annex request timed out"
     cancelMsg = "Annex request cancelled."
     if not await warnUser(ctx, client, warnText, cancelMsg, timeOutText, 30, "CONFIRM"):
@@ -219,6 +219,7 @@ async def buildHandler(ctx, plot, structure, client):
         playerData[structure + "S"] += 1
     setTownData(townID, townData)
     setPlayerData(ctx.author.id, playerData)
+    embed.color = discord.Color.green()
     embed.description = f"{structure.capitalize()} built!"
     await ctx.send(embed=embed)
     return
