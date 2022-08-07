@@ -7,6 +7,7 @@ from tbLib.playerData import *
 from tbLib.townsData import *
 from tbLib.identifier import *
 from tbLib.makeEmbed import makeEmbed
+from tbLib.tbutils import warnUser
 
 houseCost = 1000
 plainText = "PLAIN"
@@ -152,22 +153,10 @@ async def annexHandler(ctx, plot, client):
         embed.description = f"You cannot afford this! A new plot will cost **${annexCost}**."
         await ctx.send(embed=embed)
         return
-    embed.description = f"This will cost **${annexCost}** to annex. Are you sure?\n\nType `CONFIRM` to confirm"
-    embed.color = discord.Color.teal()
-    await ctx.send(embed=embed)
-
-    def check(m):
-        return m.author == ctx.author
-
-    try:
-        msg = await client.wait_for("message", check=check, timeout=30)
-    except asyncio.TimeoutError:
-        embed.description = "Annex request timed out"
-        await ctx.send(embed=embed)
-        return
-    if msg.content.upper() != "CONFIRM":
-        embed.description = "Annex request cancelled."
-        await ctx.send(embed=embed)
+    warnText =  f"This will cost **${annexCost}** to annex. Are you sure?\n\nType `CONFIRM` to confirm"
+    timeOutText = "Annex request timed out"
+    cancelMsg = "Annex request cancelled."
+    if not await warnUser(ctx, client, warnText, cancelMsg, timeOutText, 30, "CONFIRM"):
         return
     newPlot = makePlot(playerID)
     townData["PLOTS"][plot] = newPlot
@@ -219,22 +208,10 @@ async def buildHandler(ctx, plot, structure, client):
         embed.description = f"You Cannot afford that! The price to build a new **{structure.lower()}** is **${structurePrice}**."
         await ctx.send(embed=embed)
         return
-    embed.description = f"This will cost **${structurePrice}** to build. Are you sure?\n\nType `CONFIRM` to confirm"
-    embed.color = discord.Color.teal()
-    await ctx.send(embed=embed)
-
-    def check(m):
-        return m.author == ctx.author
-
-    try:
-        msg = await client.wait_for("message", check=check, timeout=30)
-    except asyncio.TimeoutError:
-        embed.description = "Build request timed out"
-        await ctx.send(embed=embed)
-        return
-    if msg.content.upper() != "CONFIRM":
-        embed.description = "Build request cancelled."
-        await ctx.send(embed=embed)
+    warnText = f"This will cost **${structurePrice}** to build. Are you sure?\n\nType `CONFIRM` to confirm"
+    timeOutText = "Build request timed out"
+    cancelMsg = "Build request cancelled."
+    if not await warnUser(ctx, client, warnText, cancelMsg, timeOutText, 30, "CONFIRM"):
         return
     townData["PLOTS"][plot]["PLOTTYPE"] = structure
     playerData["BALANCE"] -= structurePrice

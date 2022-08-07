@@ -30,9 +30,9 @@ async def townCommandsHandler(ctx, args, client):
         return
     if args[0] == "new":
         if argsCount == 1:
-            await newTownHandler(ctx)
+            await newTownHandler(ctx, client)
         else:
-            await newTownHandler(ctx, args[1])
+            await newTownHandler(ctx, client, args[1])
         return
     if args[0] == "delete":
         await deleteTownHandler(ctx, client)
