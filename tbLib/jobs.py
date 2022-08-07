@@ -6,6 +6,7 @@ import time
 
 from tbLib.makeEmbed import makeEmbed
 from tbLib.playerData import *
+from tbLib.townsData import isMayor, getTownData, setTownData
 
 waitTime = 10                                                           # specifies time to wait between commands
 
@@ -20,6 +21,18 @@ def calculateXP(plots):                                                 # calcul
     baseXP = 10 * (1.5 ** plots)
     modifier = random.randint(85, 115) / 100
     return int(baseXP * modifier)
+
+
+def calculateMayorBonus(playerID, structureType) -> float:
+    if not isMayor(playerID):
+        return 1
+    townID = getPlayerTown(playerID)
+    townData = getTownData(townID)
+    structures = 0
+    for plot in townData["PLOTS"]:
+        if townData["PLOTS"][plot]["PLOTTYPE"] == structureType:
+            structures += 1
+    return 1 + (structures / 10)
 
 
 def calculateNextLevel(level):                                          # calculates required XP based on level
@@ -71,28 +84,30 @@ async def catchHandler(ctx):
 
 async def jobHandler(ctx, job, timeToUse, level, plotName, xp, flavorText, sidebarColor):
     embed = makeEmbed()
-    userID = ctx.author.id
-    userData = getPlayerData(userID)                                    # fetches player data
+    playerID = str(ctx.author.id)
+    playerData = getPlayerData(playerID)                                    # fetches player data
     currentTime = int(time.time())                                      # gets current time
-    timeSince = currentTime - userData[timeToUse]                       # calculates time since last input
+    timeSince = currentTime - playerData[timeToUse]                       # calculates time since last input
     if timeSince < waitTime:                                            # if timeSince is too small, let player know how much more time to wait and return
         embed.description = f"You need to wait {waitTime - timeSince} more seconds before you {job} again."
         embed.color = discord.Color.red()
         await ctx.send(embed=embed)
         return
-    else:
-        moneyMade = calculateMoney(userData[level], userData[plotName]) # calculates how much money to make
-        xpMade = calculateXP(userData[plotName])                        # calculates how much xp to make
-        embed.description = f"{flavorText}\nMade ${moneyMade} and gained {xpMade} xp."
-        userData["BALANCE"] += moneyMade                                # gives player money
-        userData[xp] += xpMade                                          # gives player xp
-        while userData[xp] > calculateNextLevel(userData[level]):       # while the player has more money than the required XP to level up, level up
-            userData[xp] -= calculateNextLevel(userData[level])
-            userData[level] += 1
-            embed.description += f"\n\n**LEVEL UP!!** You are now level " + str(userData[level]) + "."
-        userData[timeToUse] = currentTime                               # set last time action was done
-        setPlayerData(userID, userData)                                 # dump player data to their JSON file
-        embed.set_footer(text="Level: " + str(userData[level]) + ", Progress: " + str(userData[xp]) + "/" + str(
-            calculateNextLevel(userData[level])) + f". You now have ${getPlayerBalance(ctx.author.id)}.")                       # put level and xp progress in footer
-        embed.color = sidebarColor
-        await ctx.send(embed=embed)
+    moneyMade = calculateMoney(playerData[level], playerData[plotName]) # calculates how much money to make
+    if isMayor(playerID):
+        moneyMade = int(moneyMade * calculateMayorBonus(playerID, plotName[0:-1]))
+    xpMade = calculateXP(playerData[plotName])                        # calculates how much xp to make
+    embed.description = f"{flavorText}\nMade ${moneyMade} and gained {xpMade} xp."
+    playerData["BALANCE"] += moneyMade                                # gives player money
+
+    playerData[xp] += xpMade                                          # gives player xp
+    while playerData[xp] > calculateNextLevel(playerData[level]):       # while the player has more money than the required XP to level up, level up
+        playerData[xp] -= calculateNextLevel(playerData[level])
+        playerData[level] += 1
+        embed.description += f"\n\n**LEVEL UP!!** You are now level " + str(playerData[level]) + "."
+    playerData[timeToUse] = currentTime                               # set last time action was done
+    setPlayerData(playerID, playerData)                                 # dump player data to their JSON file
+    embed.set_footer(text="Level: " + str(playerData[level]) + ", Progress: " + str(playerData[xp]) + "/" + str(
+        calculateNextLevel(playerData[level])) + f". You now have ${getPlayerBalance(ctx.author.id)}.")                       # put level and xp progress in footer
+    embed.color = sidebarColor
+    await ctx.send(embed=embed)

@@ -22,3 +22,16 @@ async def warnUser(ctx, client, warningMsg, cancelMsg, timeoutMsg, timer, confir
         await ctx.send(embed=embed)
         return False
     return True
+
+
+# given a number, low, and high, determines if number is valid, not a number, too low, or too high
+def isNumInLimits(number, low, high):
+    try:
+        value = int(number)
+    except ValueError:
+        return "NaN"
+    if value < low:
+        return "LOW"
+    if value > high:
+        return "HIGH"
+    return "VALID"
