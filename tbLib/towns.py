@@ -14,6 +14,7 @@ from tbLib.townsData import *
 from tbLib.makeMap import makeForSaleMap, makeOwnerMap, makeMap, getMap
 from tbLib.identifier import identify, getFullName
 from tbLib.plots import makePlot, calculateNextPlot
+from tbLib.tbutils import warnUser
 
 townCost = 25000
 plainText = "PLAIN"
@@ -63,7 +64,7 @@ async def townInfoHandler(ctx, name="NONE"):
     await ctx.send(embed=embed)
 
 
-async def newTownHandler(ctx, name="NONE"):
+async def newTownHandler(ctx, client, name="NONE"):
     playerID = str(ctx.author.id)
     playerData = getPlayerData(playerID)
     embed = makeEmbed()
@@ -83,8 +84,13 @@ async def newTownHandler(ctx, name="NONE"):
         embed.description = f"There is already a town with this name!"
         await ctx.send(embed=embed)
         return
-    else:
-        townName = name
+    townName = name
+    warnText = f"""Are you sure you want to create a town? It will cost **${townCost}**.
+                \n\nType `CONFIRM` to confirm."""
+    timeOutText = "Town deletion request timed out."
+    cancelMsg = "Town deletion request cancelled."
+    if not await warnUser(ctx, client, warnText, cancelMsg, timeOutText, 30, "CONFIRM"):
+        return
     with open(f"non-code/inittown.json", "r") as read_file:
         townData = json.load(read_file)
     townData["NAME"] = townName
@@ -113,22 +119,10 @@ async def deleteTownHandler(ctx, client):
         embed.color = discord.Color.red()
         await ctx.send(embed=embed)
         return
-    embed.color = discord.Color.dark_orange()
-    embed.description = """Are you sure you want to delete your town? Your plots and your resident's plots will be gone forever!\n\nType `DELETE` to confirm"""
-    await ctx.send(embed=embed)
-
-    def check(m):
-        return m.author == ctx.author
-
-    try:
-        msg = await client.wait_for("message", check=check, timeout=30)
-    except asyncio.TimeoutError:
-        embed.description = "Town deletion request timed out."
-        await ctx.send(embed=embed)
-        return
-    if msg.content.upper() != "DELETE":
-        embed.description = "Town deletion request cancelled."
-        await ctx.send(embed=embed)
+    warnText = """Are you sure you want to delete your town? Your plots and your resident's plots will be gone forever!\n\nType `DELETE` to confirm"""
+    timeOutText = "Town deletion request timed out."
+    cancelMsg = "Town deletion request cancelled."
+    if not await warnUser(ctx, client, warnText, cancelMsg, timeOutText, 30, "DELETE"):
         return
     townID = getPlayerData(ctx.author.id)["TOWN"]
     townName = getTownName(townID)
@@ -199,21 +193,11 @@ async def leaveHandler(ctx, client):
         embed.description = "You cannot leave a town you own! Appoint another mayor using `-town set mayor` or delete the town using `-town delete`."
         await ctx.send(embed=embed)
         return
-    embed.description = """Are you sure you want to leave your town? Your plots will be gone forever!\n\nType `CONFIRM` to confirm"""
-    await ctx.send(embed=embed)
-
-    def check(m):
-        return m.author == ctx.author
-
-    try:
-        msg = await client.wait_for("message", check=check, timeout=30)
-    except asyncio.TimeoutError:
-        embed.description = "Town leave request timed out."
-        await ctx.send(embed=embed)
-        return
-    if msg.content.upper() != "CONFIRM":
-        embed.description = "Town leave request cancelled."
-        await ctx.send(embed=embed)
+    warnText = """Are you sure you want to leave your town? Your plots will be gone forever!
+                \n\nType `CONFIRM` to confirm"""
+    timeOutText = "Town leave request timed out."
+    cancelMsg = "Town leave request cancelled."
+    if not await warnUser(ctx, client, warnText, cancelMsg, timeOutText, 30, "CONFIRM"):
         return
     clearUserLand(ctx)
     embed.description = "You left town."
