@@ -107,7 +107,14 @@ async def townCommandsHandler(ctx, args, client):
             return
         await townListHandler(ctx, args[1])
         return
-
+    if args[0] == "buy":
+        if argsCount != 2:
+            embed = makeEmbed()
+            embed.description = "Invalid syntax! Syntax is `-plot annex YX`, i.e. `-plot annex C4`."
+            await ctx.send(embed=embed)
+            return
+        await annexHandler(ctx, args[1], client)
+        return
     if args[0] in ["annex", "build", "clear"]:
         await plotCommandsHandler(ctx, args, client)
         return

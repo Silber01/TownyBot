@@ -52,8 +52,8 @@ async def common(ctx):
 
 # --------- Help ---------------
 @client.command()
-async def help(ctx):
-    await helpHandler(ctx)
+async def help(ctx, page="NONE"):
+    await helpHandler(ctx, page)
 
 
 @client.command()
