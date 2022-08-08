@@ -1,13 +1,12 @@
-**Abstract**
-TownyBot is a Discord Bot that works as a town-based economy . Players can work jobs, live in towns, build plots, buy towns, gamble, and make money.
+Welcome to TownyBot! TownyBot is a town-based RPG Discord bot. Starting with nothing but the will to thrive, work your way up from a lowly resident to the mayor of a metropolis!
 
-**Jobs**
-There are Four main jobs: Mining, Woodcutting, Farming, and Fishing. Players can do a specific  job once every 15 seconds (as in once you mine, for example, you cannot mine again for 15 seconds, but you can still do other jobs), and gain money and XP for doing so. When players level up, they will make more money every time they do that job. Players can also make more money by doing a job by owning plots with structures dedicated to that job. More information in "Towns."
+The first thing you'll need to achieve that metropolis is some money. There are Four main jobs: Mining, Woodcutting, Farming, and Fishing. You can perform these jobs every 10 seconds with `-mine`, `-chop`, `-harvest`, and `-catch`. 
 
-**Towns**
-Players own a town, and buy plots for money. However, they are taxed a fixed amount for every plot that they own. The purpose of plots is to build structures to make more money with jobs. The structures that players can build are mines, forests, farms, and ponds, which will make more money for mining, woodcutting, farming, and fishing respectively. A plot can only hold one structure, but players can have multiple plots that have the same type of structure.
+Once you've got money, you'll still need some land to work with. Ask any mayors in your server if you can join their town! They'll need to have a house for sale for you to join. You will also want some extra land to build structures. **Structures increase how much money and xp you make from jobs**, but be careful! The price for making structures increases exponentially. More info on how to use towns can be found in `-help towns`
 
-**Gambling**
-Players are able to gamble with each other by dicing. One player invites another to play a dice by sending them an invitation with the size of the dice, the amount of dice,  the way the winner is determined (low, high, total), and how much money each player puts in. The player invited can either accept or deny the dice. If they accept it, the dice are thrown and the winner is announced. The winner gets their money back along with the money of the opponent.
+Eventually, you'll want to make your own town. Though structure prices increase exponentially, **Mayors get a 10% bonus for ALL structures in their town, regardless of who owns them!**. Once you make a town, you'll want to keep some land for yourself. However, for all the land you can't afford to use yet can be given to residents! The more structures your residents make, the more money you make! You will still earn more money from structures you make yourself.
 
-**To see commands list, do `-commands`!**
+You're spending money to make money! Work through the ranks to become the richest TownyBot player! You can see the richest people via `-baltop`.
+
+**For help with commands, do `-help commands`**
+**For help with towns, do `-help towns`**

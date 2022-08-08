@@ -1,35 +1,21 @@
-**__Command List__**
+Below are the commands to see various stats, work, and use money.
 
-**Help**
-`-help`: Explains general concept of the bot
-`-commands`: Gives list of commands.
+**__STATS__**
+`-stats <player (optional)>`: View your stats, including your balance, town, job levels, and structures owned. You can also specify which player's stats you want to see.
+`-balance <player (optional)>`: See how much money you own. You can also specify which player's balance you want to see.
+`-levels <player (optional)>`: See more detailed information about your job levels. You can also specify which player's levels you want to see.
+`-baltop <page (optional)>`: See the global leaderboard for who is the richest. You can also select which page of the list you want to see.
 
-**Stats**
-`-stats <player>`: Shows full stats, including balance, job levels, and town plot information of player. If player not specified, shows your stats.
-`-bal <player>`: Shows balance of player. If player not specified, shows your balance..
-`-levels <player>`: Shows job levels of player. If player not specified, shows your levels.
-`-town info <player>`: Shows town plot information of player. If player not specified, shows your town information.
-`-baltop <page>`: Shows top players by balance.
 
-**Jobs**
-`-mine`: Mines, giving money and miner XP.
-`-chop`: Chops wood, giving money and woodcutter XP.
-`-harvest`: Farms crops, giving money and farmer XP.
-`-catch`: Catches fish, giving money and fisherman XP.
+**__MONEY__**
+TownyBot is an economy based bot, so money is quite important! You can make money by mining, woodcutting, fishing, and farming. Once you do a job, you must wait 10 seconds before you can do it again. You can also pay others, and gamble with others by dicing!
+`-mine`: Mine. Money and XP gain increases the more mines you own
+`-chop`: Chop wood. Money and XP gain increases the more forests you own
+`-catch`: Catch fish. Money and XP gain increases the more ponds you own
+`-harvest`: Harvest crops. Money and XP gain increases the more farms you own
 
-**Town**
-`-town info <player>`: Shows town plot information of player. If player not specified, shows your town information.
-`-town prices`: Shows prices for new plots and structures
-`-town rename <newName>`: Renames your town.
-`-town buy <amount>`: Buys amount of plots specified, if town can hold it. If amount not specified, buys one plot.
-`-town build <structure> <amount>`: Builds given structure for amount of plots specified, if enough empty plots are available. If amount not specified, builds one structure.
-`-town destroy <structure> <amount>`: Destroys given structures, converting them into empty plots. If amount not specified, destroys one structure.
-`-town abandonplot <amount>`: Abandons amount of plots specified. If amount not specified, abandons one plot.
+`-pay <player> <amount>`: Pay a player a given amount of money.
 
-**Gambling**
-`-dice <player> <dice size> <dice rolls> <win condition> <amount>`: Challenges given player to a dice roll with given dice size, amount of rolls, and win condition for given amount, if both players can afford it.
-`-dice accept`: Accepts current dice challenge.
-`-dice deny`: Refuses current dice challenge.
+`-dice <player> <dice size> <dice throws> <win method> <bet>`: Gamble with another player. The win methods you can use are `high`, `low`, `total`, and `wins`.
 
-**Misc**
-`-pay <player> <amount>`: Pays specified player the specified amount
+**For information on towny commands, do** `-help towns`

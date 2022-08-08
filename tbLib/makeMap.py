@@ -102,7 +102,7 @@ def getTile(townData, tileID):
     tileTypes = {
         "PLAIN": ["plain", "plain", "plain", "plain", "plain", "plain", "plain", "plain3", "plain3", "plain3", "plain2", "plain1"],
         "MINE": ["mine1", "mine2"],
-        "FOREST": ["forest"],
+        "FOREST": ["forest1", "forest2"],
         "FARM": ["farm1", "farm2"],
         "POND": ["pond1", "pond2", "pond3"],
         "HOUSE": ["house"],

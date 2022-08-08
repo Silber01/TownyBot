@@ -3,9 +3,15 @@ import discord
 from tbLib.makeEmbed import makeEmbed
 
 
-# prints help.txt
-async def helpHandler(ctx):
-    with open("non-code/help.txt", "r") as read_file:
+# prints help page specified
+async def helpHandler(ctx, page="NONE"):
+    page = page.upper()
+    helpPage = "help.txt"
+    if page == "COMMANDS":
+        helpPage = "commands.txt"
+    if page == "TOWNS":
+        helpPage = "townyhelp.txt"
+    with open(f"non-code/{helpPage}", "r") as read_file:
         helpText = read_file.read()
     embed = makeEmbed()
     embed.description = helpText
