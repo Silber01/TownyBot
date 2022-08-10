@@ -1,3 +1,4 @@
+import asyncio
 import random
 from math import ceil
 import discord
@@ -9,7 +10,8 @@ from tbLib.playerData import *
 from tbLib.townsData import isMayor, getTownData, setTownData
 
 waitTime = 10                                                           # specifies time to wait between commands
-
+scavengeWaitTime = 3600
+scrambleTime = 30
 
 def calculateMoney(level, plots):                                       # calculates money to make based on level and plots owned.
     baseMoney = (20 + ceil(level ** 1.35)) * (1.2 ** plots)
@@ -64,6 +66,14 @@ fishFlavor = ["While out fishing, you only caught seaweed. Fortunately, a Sushi 
               "You sat down for a couple hours and caught nothing. A fisherman who caught a sizable amount of fish at the same time felt bad, and gave you one of their fishes.",
               "You reeled in your rod and caught a cool looking fish.",
               "You reeled in your rod and caught the skeleton of a missing person. You called the police to give them this information and collected the bounty."]
+scavengeFlavor = ["After following a treasure map an old man gave you, you found the X that marks the spot!",
+                  "Though you had your doubts before buying this metal detector, it seems that it's already paid itself off!",
+                  "You decided to take a trip to some ancient ruins, but you accidentally discovered a treasure room never seen before!",
+                  "On your daily walk, you tripped and fell over something in the middle of the trail. You were upset over it until you looked at what exactly you tripped over.",
+                  "It looks like your hours of digging random holes in the ground has paid off!"]
+scavengeWords = ["GOLD", "SILVER", "DIAMONDS", "JEWELS", "EMERALDS", "JADE", "RUBIES", "RELIC", "CHEST", "PEARLS",
+                 "NECKLACE", "BRACELET", "SAPPHIRE", "AMETHYST", "COINS", "CROWN", "EARRINGS", "TREASURE", "FORTUNE",
+                 "GEMSTONES"]
 
 
 async def mineHandler(ctx):
@@ -111,3 +121,65 @@ async def jobHandler(ctx, job, timeToUse, level, plotName, xp, flavorText, sideb
         calculateNextLevel(playerData[level])) + f". You now have ${getPlayerBalance(ctx.author.id)}.")                       # put level and xp progress in footer
     embed.color = sidebarColor
     await ctx.send(embed=embed)
+
+
+async def scavengeHandler(ctx, client):
+    embed = makeEmbed()
+    playerID = str(ctx.author.id)
+    playerData = getPlayerData(playerID)  # fetches player data
+    currentTime = int(time.time())
+    timeLeft = scavengeWaitTime - (currentTime - playerData["LASTSCAVENGE"])
+    if timeLeft > 0:
+        embed.color = discord.Color.red()
+        embed.description = f"You cannot scavenge for another {int(timeLeft / 60)} minutes, {timeLeft % 60} seconds."
+        await ctx.send(embed=embed)
+        return
+    flavorText = random.choice(scavengeFlavor)
+    treasure = random.choice(scavengeWords)
+    scrambedTreasure = scrambleWord(treasure)
+    embed.description = f"{flavorText}\n\nUnscramble this word to get what you discovered: **{scrambedTreasure}**"
+    embed.set_footer(text=f"You have {scrambleTime} seconds to unscramble!.")
+    embed.color = discord.Color.green()
+    await ctx.send(embed=embed)
+    embed = makeEmbed()
+    timeOut = currentTime + scrambleTime
+    def check(m):
+        return m.author == ctx.author
+    guessedCorrectly = False
+    while not guessedCorrectly:
+        try:
+            msg = await client.wait_for("message", check=check, timeout=timeOut - int(time.time()))
+        except asyncio.TimeoutError:
+            embed.color = discord.Color.red()
+            embed.description = "You ran out of time. Better luck next time!"
+            await ctx.send(embed=embed)
+            return
+        if msg.content.upper() != treasure:
+            embed.color = discord.Color.dark_orange()
+            embed.description = f"That's not correct! You have {timeOut - int(time.time())} seconds left. The scrambled word is **{scrambedTreasure}**."
+            await ctx.send(embed=embed)
+        else:
+            guessedCorrectly = True
+    embed = makeEmbed()
+    moneyMade = int(800 * random.randint(85, 115) / 100)
+    embed.color = discord.Color.green()
+    embed.description = f"You guessed it correctly! You made **${moneyMade}**."
+    playerData["BALANCE"] += moneyMade
+    playerData["LASTSCAVENGE"] = currentTime
+    setPlayerData(playerID, playerData)
+    await ctx.send(embed=embed)
+    return
+
+def scrambleWord(word):
+    charList = list(word)
+    wordLen = len(word) - 1
+    for i in range(100):
+        index1 = random.randint(0, wordLen)
+        index2 = random.randint(0, wordLen)
+        tempChar = charList[index1]
+        charList[index1] = charList[index2]
+        charList[index2] = tempChar
+    scrambled = ""
+    for char in charList:
+        scrambled += char
+    return scrambled

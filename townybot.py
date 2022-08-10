@@ -9,7 +9,7 @@ import asyncio
 from tbLib.help import helpHandler, commandsHandler
 from tbLib.nameGenerator import generateName
 from tbLib.stats import statsHandler, balanceHandler, levelsHandler, baltopHandler
-from tbLib.jobs import mineHandler, chopHandler, harvestHandler, catchHandler
+from tbLib.jobs import mineHandler, chopHandler, harvestHandler, catchHandler, scavengeHandler
 from tbLib.dicing import diceHandler, deqDiceTTLs, denyHandler, cancelHandler, acceptHandler
 from tbLib.pay import payHandler
 from tbLib.townycommands import townCommandsHandler, plotCommandsHandler
@@ -111,9 +111,15 @@ async def farm(ctx):
 async def catch(ctx):
     await catchHandler(ctx)
 
+
 @client.command()
 async def fish(ctx):
     await catchHandler(ctx)
+
+
+@client.command()
+async def scavenge(ctx):
+    await scavengeHandler(ctx, client)
 
 
 # -------- Town ---------------
