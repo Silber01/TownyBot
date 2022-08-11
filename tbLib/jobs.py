@@ -127,6 +127,7 @@ async def scavengeHandler(ctx, client):
     embed = makeEmbed()
     playerID = str(ctx.author.id)
     playerData = getPlayerData(playerID)  # fetches player data
+    playerName = playerData["NAME"]
     currentTime = int(time.time())
     timeLeft = scavengeWaitTime - (currentTime - playerData["LASTSCAVENGE"])
     if timeLeft > 0:
@@ -151,19 +152,19 @@ async def scavengeHandler(ctx, client):
             msg = await client.wait_for("message", check=check, timeout=timeOut - int(time.time()))
         except asyncio.TimeoutError:
             embed.color = discord.Color.red()
-            embed.description = "You ran out of time. Better luck next time!"
+            embed.description = f"**{playerName}**, You ran out of time. Better luck next time!"
             await ctx.send(embed=embed)
             return
         if msg.content.upper() != treasure:
             embed.color = discord.Color.dark_orange()
-            embed.description = f"That's not correct! You have {timeOut - int(time.time())} seconds left. The scrambled word is **{scrambedTreasure}**."
+            embed.description = f"**{playerName}**, That's not correct! You have {timeOut - int(time.time())} seconds left. The scrambled word is **{scrambedTreasure}**."
             await ctx.send(embed=embed)
         else:
             guessedCorrectly = True
     embed = makeEmbed()
     moneyMade = int(800 * random.randint(85, 115) / 100)
     embed.color = discord.Color.green()
-    embed.description = f"You guessed it correctly! You made **${moneyMade}**."
+    embed.description = f"**{playerName}**, You guessed it correctly! You made **${moneyMade}**."
     playerData["BALANCE"] += moneyMade
     playerData["LASTSCAVENGE"] = currentTime
     setPlayerData(playerID, playerData)

@@ -159,6 +159,7 @@ async def annexHandler(ctx, plot, client):
     newPlot = makePlot(playerID)
     townData["PLOTS"][plot] = newPlot
     playerData["BALANCE"] -= annexCost
+    playerData["PLOTS"] += 1
     setPlayerData(playerID, playerData)
     setTownData(townID, townData)
     embed.color = discord.Color.green()
@@ -337,7 +338,9 @@ async def forsaleHandler(ctx, plot):
     else:
         townData["PLOTS"][plot]["PLOTTYPE"] = "FORSALE"
     townData["PLOTS"][plot]["OWNER"] = None
-
+    playerData = getPlayerData(playerID)
+    playerData["PLOTS"] -= 1
+    setPlayerData(playerID, playerData)
     setTownData(townID, townData)
     embed.description = f"Plot marked for sale!"
     embed.color = discord.Color.green()
@@ -376,6 +379,9 @@ async def notforsaleHandler(ctx, plot):
     embed.description = f"Plot marked not for sale!"
     embed.color = discord.Color.green()
     await ctx.send(embed=embed)
+    playerData = getPlayerData(playerID)
+    playerData["PLOTS"] += 1
+    setPlayerData(playerID, playerData)
     return
 
 
