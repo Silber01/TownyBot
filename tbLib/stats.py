@@ -3,7 +3,7 @@ import os
 import discord
 import json
 from tbLib.identifier import identify, getFullName
-from tbLib.makeEmbed import makeEmbed
+from tbLib.tbutils import makeEmbed
 from tbLib.jobs import calculateNextLevel
 from tbLib.playerData import *
 from tbLib.townsData import getTownName

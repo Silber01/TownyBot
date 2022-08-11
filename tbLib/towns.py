@@ -6,7 +6,7 @@ import discord
 import secrets
 
 from tbLib.playerData import *
-from tbLib.makeEmbed import makeEmbed
+from tbLib.tbutils import makeEmbed
 from tbLib.nameGenerator import generateName
 from tbLib.townsData import *
 from tbLib.makeMap import makeOwnerMap, getMap
@@ -370,27 +370,27 @@ async def townListHandler(ctx, page=1):
         await ctx.send(embed=embed)
         return
     towns = {}
-    for town in os.listdir("towns"):                                          # iterates through all users and adds full name and balance to users
+    for town in os.listdir("towns"):
         townID = town.replace(".json", "")
         townData = getTownData(townID)
         townName = townData["NAME"]
         timeMade = townData["TIMEMADE"]
         towns[townName] = timeMade
-    sortedTowns = sorted(towns.items(), key=lambda x: x[1])  # sorts users by values and stores result in sortedUsers
+    sortedTowns = sorted(towns.items(), key=lambda x: x[1])
     print(sortedTowns)
     embed = makeEmbed()
     embed.description = "**__Towns List:__**\n"
-    place = 0  # iterator for placement of user
-    pageSize = 10  # determines how many people fit on one page
-    startPlace = (int(page) - 1) * pageSize  # determines where to start by given page value
-    leaderboard = []  # initializes empty list for users to be put in
-    for town in sortedTowns:  # iterates through all users
+    place = 0
+    pageSize = 10
+    startPlace = (int(page) - 1) * pageSize
+    leaderboard = []
+    for town in sortedTowns:
         print(town[0])
-        if startPlace <= place < startPlace + pageSize:  # checks if place is within bounds of the page requested
-            townStats = f"{place + 1}. **{town[0]}**"  # adds full name and balance to leaderboard
+        if startPlace <= place < startPlace + pageSize:
+            townStats = f"{place + 1}. **{town[0]}**"
             leaderboard.append(townStats)
         place += 1
-    for town in leaderboard:  # adds users to the description
+    for town in leaderboard:
         embed.description += "\n" + town
     embed.color = discord.Color.purple()
     await ctx.send(embed=embed)

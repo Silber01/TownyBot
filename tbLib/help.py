@@ -1,6 +1,6 @@
 import discord
 
-from tbLib.makeEmbed import makeEmbed
+from tbLib.tbutils import makeEmbed
 
 
 # prints help page specified

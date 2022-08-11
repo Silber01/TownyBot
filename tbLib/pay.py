@@ -3,9 +3,8 @@ import os
 import discord
 
 from tbLib.identifier import identify, getFullName
-from tbLib.makeEmbed import makeEmbed
 from tbLib.playerData import *
-from tbLib.tbutils import isNumInLimits
+from tbLib.tbutils import isNumInLimits, makeEmbed
 
 # handles pay command
 async def payHandler(ctx, person, amount):
