@@ -5,13 +5,14 @@ import discord
 import json
 import time
 
-from tbLib.makeEmbed import makeEmbed
+from tbLib.tbutils import makeEmbed
 from tbLib.playerData import *
-from tbLib.townsData import isMayor, getTownData, setTownData
+from tbLib.townsData import isMayor, getTownData
 
 waitTime = 10                                                           # specifies time to wait between commands
-scavengeWaitTime = 3600
-scrambleTime = 30
+scavengeWaitTime = 3600                                                 # specifies how long to wait between scavenges
+scrambleTime = 30                                                       # specifies how long players have to unscramble the scavenge word
+
 
 def calculateMoney(level, plots):                                       # calculates money to make based on level and plots owned.
     baseMoney = (20 + ceil(level ** 1.35)) * (1.2 ** plots)
@@ -25,8 +26,8 @@ def calculateXP(plots):                                                 # calcul
     return int(baseXP * modifier)
 
 
-def calculateMayorBonus(playerID, structureType) -> float:
-    if not isMayor(playerID):
+def calculateMayorBonus(playerID, structureType) -> float:              # provides a 10% bonus for every structure in the town
+    if not isMayor(playerID):                                           # that correlates to the job done
         return 1
     townID = getPlayerTown(playerID)
     townData = getTownData(townID)
@@ -95,9 +96,9 @@ async def catchHandler(ctx):
 async def jobHandler(ctx, job, timeToUse, level, plotName, xp, flavorText, sidebarColor):
     embed = makeEmbed()
     playerID = str(ctx.author.id)
-    playerData = getPlayerData(playerID)                                    # fetches player data
+    playerData = getPlayerData(playerID)                                # fetches player data
     currentTime = int(time.time())                                      # gets current time
-    timeSince = currentTime - playerData[timeToUse]                       # calculates time since last input
+    timeSince = currentTime - playerData[timeToUse]                     # calculates time since last input
     if timeSince < waitTime:                                            # if timeSince is too small, let player know how much more time to wait and return
         embed.description = f"You need to wait {waitTime - timeSince} more seconds before you {job} again."
         embed.color = discord.Color.red()
@@ -108,14 +109,14 @@ async def jobHandler(ctx, job, timeToUse, level, plotName, xp, flavorText, sideb
         moneyMade = int(moneyMade * calculateMayorBonus(playerID, plotName[0:-1]))
     xpMade = calculateXP(playerData[plotName])                        # calculates how much xp to make
     embed.description = f"{flavorText}\nMade ${moneyMade} and gained {xpMade} xp."
-    playerData["BALANCE"] += moneyMade                                # gives player money
+    playerData["BALANCE"] += moneyMade                                  # gives player money
 
-    playerData[xp] += xpMade                                          # gives player xp
+    playerData[xp] += xpMade                                            # gives player xp
     while playerData[xp] > calculateNextLevel(playerData[level]):       # while the player has more money than the required XP to level up, level up
         playerData[xp] -= calculateNextLevel(playerData[level])
         playerData[level] += 1
         embed.description += f"\n\n**LEVEL UP!!** You are now level " + str(playerData[level]) + "."
-    playerData[timeToUse] = currentTime                               # set last time action was done
+    playerData[timeToUse] = currentTime                                 # set last time action was done
     setPlayerData(playerID, playerData)                                 # dump player data to their JSON file
     embed.set_footer(text="Level: " + str(playerData[level]) + ", Progress: " + str(playerData[xp]) + "/" + str(
         calculateNextLevel(playerData[level])) + f". You now have ${getPlayerBalance(ctx.author.id)}.")                       # put level and xp progress in footer
@@ -126,61 +127,62 @@ async def jobHandler(ctx, job, timeToUse, level, plotName, xp, flavorText, sideb
 async def scavengeHandler(ctx, client):
     embed = makeEmbed()
     playerID = str(ctx.author.id)
-    playerData = getPlayerData(playerID)  # fetches player data
-    playerName = playerData["NAME"]
+    playerData = getPlayerData(playerID)                                # fetches player data
+    playerName = playerData["NAME"]                                     # gets player name for messages, reduces confusion when multiple players are using the bot at the same time
     currentTime = int(time.time())
-    timeLeft = scavengeWaitTime - (currentTime - playerData["LASTSCAVENGE"])
-    if timeLeft > 0:
+    timeLeft = scavengeWaitTime - (currentTime - playerData["LASTSCAVENGE"])        # calculates time in seconds between now and last scavenge time and how much time left to wait
+    if timeLeft > 0:                                                    # scavenge cooldown still in effect
         embed.color = discord.Color.red()
         embed.description = f"You cannot scavenge for another {int(timeLeft / 60)} minutes, {timeLeft % 60} seconds."
         await ctx.send(embed=embed)
         return
-    flavorText = random.choice(scavengeFlavor)
-    treasure = random.choice(scavengeWords)
-    scrambedTreasure = scrambleWord(treasure)
+    flavorText = random.choice(scavengeFlavor)                          # gets a random flavor text
+    treasure = random.choice(scavengeWords)                             # picks a treasure word
+    scrambedTreasure = scrambleWord(treasure)                           # scrambles the word
     embed.description = f"{flavorText}\n\nUnscramble this word to get what you discovered: **{scrambedTreasure}**"
     embed.set_footer(text=f"You have {scrambleTime} seconds to unscramble!.")
     embed.color = discord.Color.green()
     await ctx.send(embed=embed)
     embed = makeEmbed()
     timeOut = currentTime + scrambleTime
-    def check(m):
+    def check(m):                                                       # defines when a bot should stop waiting for input
         return m.author == ctx.author
     guessedCorrectly = False
-    while not guessedCorrectly:
+    while not guessedCorrectly:                                         # continues asking for answer until player gets it or time runs out
         try:
-            msg = await client.wait_for("message", check=check, timeout=timeOut - int(time.time()))
-        except asyncio.TimeoutError:
+            msg = await client.wait_for("message", check=check, timeout=timeOut - int(time.time())) #timer is based on time when the command started and current time, does not reset on wrong guess
+        except asyncio.TimeoutError:                                    # cancels command when time runs out
             embed.color = discord.Color.red()
-            embed.description = f"**{playerName}**, You ran out of time. Better luck next time!"
+            embed.description = f"**{playerName}**, You ran out of time. Try again!"
             await ctx.send(embed=embed)
             return
-        if msg.content.upper() != treasure:
+        if msg.content.upper() != treasure:                             # asks to retry when guess is incorrect
             embed.color = discord.Color.dark_orange()
             embed.description = f"**{playerName}**, That's not correct! You have {timeOut - int(time.time())} seconds left. The scrambled word is **{scrambedTreasure}**."
             await ctx.send(embed=embed)
         else:
             guessedCorrectly = True
-    embed = makeEmbed()
-    moneyMade = int(800 * random.randint(85, 115) / 100)
+    embed = makeEmbed()                                                 # this code only runs if player unscrambles word before the time runs out
+    moneyMade = int(800 * random.randint(85, 115) / 100)                # money made is $800 +/- 15%
     embed.color = discord.Color.green()
     embed.description = f"**{playerName}**, You guessed it correctly! You made **${moneyMade}**."
-    playerData["BALANCE"] += moneyMade
-    playerData["LASTSCAVENGE"] = currentTime
-    setPlayerData(playerID, playerData)
+    playerData["BALANCE"] += moneyMade                                  # pays player
+    playerData["LASTSCAVENGE"] = currentTime                            # resets the scavenger time to restart cooldown
+    setPlayerData(playerID, playerData)                                 # sets player date
     await ctx.send(embed=embed)
     return
 
-def scrambleWord(word):
-    charList = list(word)
+
+def scrambleWord(word):                                                 # given a word, scrambles the letters in the word
+    charList = list(word)                                               # makes a list of characters
     wordLen = len(word) - 1
-    for i in range(100):
+    for i in range(100):                                                # swaps one random character with another 100 times
         index1 = random.randint(0, wordLen)
         index2 = random.randint(0, wordLen)
         tempChar = charList[index1]
         charList[index1] = charList[index2]
         charList[index2] = tempChar
     scrambled = ""
-    for char in charList:
+    for char in charList:                                               # puts word back together
         scrambled += char
     return scrambled

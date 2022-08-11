@@ -3,7 +3,7 @@ import os
 import discord
 
 from tbLib.townsData import *
-from tbLib.makeEmbed import makeEmbed
+from tbLib.tbutils import makeEmbed
 from tbLib.playerData import *
 from tbLib.identifier import *
 

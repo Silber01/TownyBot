@@ -85,7 +85,7 @@ async def townCommandsHandler(ctx, args, client):
         if args[1] not in ["plotprice", "mayor"]:
             embed = makeEmbed()
             embed.description = """Invalid syntax! Possible commands for `-town set` are 
-                                           `-town set mayor <new mayor>`, or `-town set plotprice <plot price>`."""
+                                `-town set mayor <new mayor>`, or `-town set plotprice <plot price>`."""
             await ctx.send(embed=embed)
         if args[1] == "plotprice":
             if argsCount != 3:

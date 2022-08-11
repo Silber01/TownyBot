@@ -5,9 +5,8 @@ import os
 import asyncio
 
 from tbLib.identifier import identify, getFullName
-from tbLib.makeEmbed import makeEmbed
 from tbLib.playerData import *
-from tbLib.tbutils import isNumInLimits
+from tbLib.tbutils import isNumInLimits, makeEmbed
 
 
 # goes through all current dice requests and decreases their time to live by a given amount
