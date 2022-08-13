@@ -10,3 +10,4 @@ You're spending money to make money! Work through the ranks to become the riches
 
 **For help with commands, do `-help commands`**
 **For help with towns, do `-help towns`**
+**For help with being a mayor, do `-help mayor`**

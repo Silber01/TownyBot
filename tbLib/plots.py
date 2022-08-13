@@ -252,7 +252,7 @@ async def abandonHandler(ctx, client, plot):
         await ctx.send(embed=embed)
         return
     if townData["PLOTS"][plot]["PLOTTYPE"] != plainText:                # checks if the plot is plains (you cannot abandon plots with structures on it)
-        embed.description = f"This plot needs to be clear before you abandon it! DO `-plot clear {plot}` first."
+        embed.description = f"This plot needs to be clear before you abandon it! Do `-plot clear {plot}` first."
         await ctx.send(embed=embed)
         return
     if not canRemovePlot(townData["PLOTS"], plot):                      # checks if removing the plot will cause the town to split apart
@@ -406,6 +406,10 @@ async def buyHandler(ctx, plot):
         return
     townID = getPlayerTown(playerID)
     townData = getTownData(townID)
+    if plot not in townData["PLOTS"]:                                   # checks if the plot belongs to the town
+        embed.description = "This plot does not belong to the town."
+        await ctx.send(embed=embed)
+        return
     plotType = townData["PLOTS"][plot]["PLOTTYPE"]
     if plotType not in [forsaleText, houseforsaleText]:                 # checks if the plot is either a plains for sale or a house for sale
         embed.description = "This plot is not for sale!"
@@ -448,6 +452,10 @@ async def unclaimHandler(ctx, plot):
         return
     townID = getPlayerTown(playerID)
     townData = getTownData(townID)
+    if plot not in townData["PLOTS"]:                                   # checks if the plot belongs to the town
+        embed.description = "This plot does not belong to the town."
+        await ctx.send(embed=embed)
+        return
     if not userOwnsPlot(playerID, townData, plot):                      # checks if user owns the plot in question
         embed.description = "You do not own that plot!"
         await ctx.send(embed=embed)

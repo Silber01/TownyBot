@@ -15,14 +15,4 @@ __**COMMANDS**__
 `-plot buy <YX>` Buy a plot that is for sale.
 `-plot unclaim <YX>` Give up a plot you own.
 
-__**MAYOR COMMANDS**__
-`-town rename <new name>`: Rename your town.
-`-town invite <player>`: Invite a player to your town. Requires having a house for sale.
-`-town kick <player>`: Kick a player from your town.
-`-town set plotprice <new price>`: Change how much it costs for residents to buy a plot.
-`-town set mayor <new mayor>`: Give the town to another player.
-`-plot annex <YX>`: Claim a new plot for the town.
-`-plot abandon <YX>`: Secede a plot from your town.
-`-plot forsale <YX>`: Mark a plot for sale.
-`-plot notforsale <YX>`: Mark a plot not for sale.
-`-town delete`: Delete your town. This will destroy all of your and your resident's structures!
+**For mayor commands, do `-help mayor`!**

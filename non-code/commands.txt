@@ -8,14 +8,18 @@ Below are the commands to see various stats, work, and use money.
 
 
 **__MONEY__**
-TownyBot is an economy based bot, so money is quite important! You can make money by mining, woodcutting, fishing, and farming. Once you do a job, you must wait 10 seconds before you can do it again. You can also pay others, and gamble with others by dicing!
+TownyBot is an economy based bot, so money is quite important! You can make money by mining, woodcutting, fishing, and farming. Once you do a job, you must wait 10 seconds before you can do it again. You can also scavenge once an hour for a huge amount of money.
+
 `-mine`: Mine. Money and XP gain increases the more mines you own
 `-chop`: Chop wood. Money and XP gain increases the more forests you own
 `-catch`: Catch fish. Money and XP gain increases the more ponds you own
 `-harvest`: Harvest crops. Money and XP gain increases the more farms you own
+`-scavenge`: Scavenge for treasure. Unscramble a word to make a huge amount of money. Can be done once per hour.
+
+You can also pay others and gamble with others by dicing!
 
 `-pay <player> <amount>`: Pay a player a given amount of money.
-
 `-dice <player> <dice size> <dice throws> <win method> <bet>`: Gamble with another player. The win methods you can use are `high`, `low`, `total`, and `wins`.
 
 **For information on towny commands, do** `-help towns`
+**For help with being a mayor, do `-help mayor`**

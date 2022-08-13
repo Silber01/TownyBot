@@ -1,26 +1,20 @@
 import json  # allows reading and writing of JSON files
 import os
 import random
-
-import discord
 from discord.ext import commands  # provides the bulk of discord bot abilities
 import asyncio
-
 from tbLib.help import helpHandler, commandsHandler
-from tbLib.nameGenerator import generateName
 from tbLib.stats import statsHandler, balanceHandler, levelsHandler, baltopHandler
 from tbLib.jobs import mineHandler, chopHandler, harvestHandler, catchHandler, scavengeHandler
 from tbLib.dicing import diceHandler, deqDiceTTLs, denyHandler, cancelHandler, acceptHandler
 from tbLib.pay import payHandler
 from tbLib.townycommands import townCommandsHandler, plotCommandsHandler
 from tbLib.playerData import *
-from tbLib.plots import plotInfo
 from tbLib.towninvites import deqTownTTLs
 
 client = commands.Bot(command_prefix='-', help_command=None)  # sets prefix and deletes default help command
 
 botTitle = "TownyBot"
-
 
 @client.event
 async def on_ready():

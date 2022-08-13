@@ -153,7 +153,7 @@ async def scavengeHandler(ctx, client):
             msg = await client.wait_for("message", check=check, timeout=timeOut - int(time.time())) #timer is based on time when the command started and current time, does not reset on wrong guess
         except asyncio.TimeoutError:                                    # cancels command when time runs out
             embed.color = discord.Color.red()
-            embed.description = f"**{playerName}**, You ran out of time. Try again!"
+            embed.description = f"**{playerName}**, You ran out of time. The word was **{treasure}**. Try again!"
             await ctx.send(embed=embed)
             return
         if msg.content.upper() != treasure:                             # asks to retry when guess is incorrect

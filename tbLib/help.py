@@ -11,6 +11,8 @@ async def helpHandler(ctx, page="NONE"):
         helpPage = "commands.txt"
     if page == "TOWNS":
         helpPage = "townyhelp.txt"
+    if page == "MAYOR":
+        helpPage = "mayorhelp.txt"
     with open(f"non-code/{helpPage}", "r") as read_file:
         helpText = read_file.read()
     embed = makeEmbed()
