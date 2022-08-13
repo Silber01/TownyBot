@@ -23,3 +23,4 @@ You can also pay others and gamble with others by dicing!
 
 **For information on towny commands, do** `-help towns`
 **For help with being a mayor, do `-help mayor`**
+**To see information about the bot itself, do `-credits`**

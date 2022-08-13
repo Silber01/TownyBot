@@ -3,7 +3,7 @@ import os
 import random
 from discord.ext import commands  # provides the bulk of discord bot abilities
 import asyncio
-from tbLib.help import helpHandler, commandsHandler
+from tbLib.help import helpHandler, commandsHandler, creditsHandler
 from tbLib.stats import statsHandler, balanceHandler, levelsHandler, baltopHandler
 from tbLib.jobs import mineHandler, chopHandler, harvestHandler, catchHandler, scavengeHandler
 from tbLib.dicing import diceHandler, deqDiceTTLs, denyHandler, cancelHandler, acceptHandler
@@ -19,7 +19,7 @@ botTitle = "TownyBot"
 @client.event
 async def on_ready():
     print("I'm ready!")
-    while True:
+    while True:                                                             # decrements ttl's by 5 seconds every 5 seconds
         await asyncio.sleep(5)
         await deqDiceTTLs(client, 5)
         await deqTownTTLs(client, 5)
@@ -28,7 +28,7 @@ async def on_ready():
 @client.before_invoke
 async def common(ctx):
     userID = ctx.author.id
-    if str(userID) + ".json" not in os.listdir("players"):
+    if str(userID) + ".json" not in os.listdir("players"):                  # checks if the user has ever used the bot before, and if not initialized the player's data
         with open("non-code/initplayer.json", "r") as read_file:
             playerData = json.load(read_file)
         playerData["NAME"] = ctx.author.name
@@ -38,7 +38,8 @@ async def common(ctx):
             json.dump(playerData, write_file)
         return
     playerData = getPlayerData(userID)
-    if ctx.author.name != playerData["NAME"] or ctx.author.discriminator != playerData["DISCRIMINATOR"]:
+    if ctx.author.name != playerData["NAME"] or \
+            ctx.author.discriminator != playerData["DISCRIMINATOR"]:        # checks if the player has changed their name and/or discriminator
         playerData["NAME"] = ctx.author.name
         playerData["DISCRIMINATOR"] = ctx.author.discriminator
         setPlayerData(userID, playerData)
@@ -53,6 +54,11 @@ async def help(ctx, page="NONE"):
 @client.command()
 async def commands(ctx):
     await commandsHandler(ctx)
+
+
+@client.command()
+async def credits(ctx):
+    await creditsHandler(ctx)
 
 
 # --------- Stats ---------------

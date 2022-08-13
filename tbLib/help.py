@@ -29,3 +29,13 @@ async def commandsHandler(ctx):
     embed.description = commandsText
     embed.colour = discord.Colour.purple()
     await ctx.send(embed=embed)
+
+
+async def creditsHandler(ctx):
+    with open("non-code/credits.txt", "r") as read_file:
+        creditsText = read_file.read()
+    embed = makeEmbed()
+    embed.description = creditsText
+    embed.colour = discord.Colour.purple()
+    await ctx.send(embed=embed)
+
