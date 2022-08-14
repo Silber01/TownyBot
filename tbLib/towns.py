@@ -152,6 +152,10 @@ async def renameHandler(ctx, name):                                             
         embed.color = discord.Color.red()
         await ctx.send(embed=embed)
         return
+    if not findTownID(name) is None:                                                        # checks if there is already a town with that name
+        embed.description = f"There is already a town with this name!"
+        await ctx.send(embed=embed)
+        return
     townID = getPlayerTown(ctx.author.id)
     townData = getTownData(townID)
     townData["NAME"] = name
