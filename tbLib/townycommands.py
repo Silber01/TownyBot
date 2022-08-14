@@ -67,10 +67,13 @@ async def townCommandsHandler(ctx, args, client):
         return
     if args[0] == "deny":                                                               # handles town deny, for invite request
         await invDenyHandler(ctx)
+        return
     if args[0] == "accept":                                                             # handles town accept, for invite request
         await invAcceptHandler(ctx)
+        return
     if args[0] == "leave":                                                              # handles town leave
         await leaveHandler(ctx, client)
+        return
     if args[0] == "kick":                                                               # handles town kick
         if argsCount != 2:                                                              # if a second argument isn't given, throw error
             embed = makeEmbed()
@@ -78,6 +81,7 @@ async def townCommandsHandler(ctx, args, client):
             await ctx.send(embed=embed)
             return
         await kickHandler(ctx, client, args[1])
+        return
     if args[0] == "set":                                                                # handles set, which is itself a subcommand. Possible sets are plotprice and mayor
         if argsCount < 2:                                                               # if no arguments are given, gives invalid syntax error and provides possible commands
             embed = makeEmbed()
@@ -89,6 +93,7 @@ async def townCommandsHandler(ctx, args, client):
             embed.description = """Invalid syntax! Possible commands for `-town set` are 
                                 `-town set mayor <new mayor>`, or `-town set plotprice <plot price>`."""
             await ctx.send(embed=embed)
+            return
         if args[1] == "plotprice":                                                      # sets price to buy a plot from the town
             if argsCount != 3:                                                          # for plotprice, checks if amount is given
                 embed = makeEmbed()
@@ -96,6 +101,7 @@ async def townCommandsHandler(ctx, args, client):
                 await ctx.send(embed=embed)
                 return
             await plotPriceHandler(ctx, args[2])
+            return
         if args[1] == "mayor":                                                          # sets new mayor for town
             if argsCount != 3:                                                          # for mayor, checks if new mayor name is given
                 embed = makeEmbed()
@@ -103,6 +109,7 @@ async def townCommandsHandler(ctx, args, client):
                 await ctx.send(embed=embed)
                 return
             await newMayorHandler(ctx, args[2], client)
+        return
     if args[0] == "list":                                                               # handles town list
         if argsCount == 1:
             await townListHandler(ctx)
@@ -153,6 +160,7 @@ async def plotCommandsHandler(ctx, args, client):
             await ctx.send(embed=embed)
             return
         await abandonHandler(ctx, client, args[1])
+        return
     if args[0] == "build":                                                              # handles building structures on a plot
         if argsCount != 3:                                                              # build needs a plot and a structure arg. If not given, throw syntax error
             embed = makeEmbed()
@@ -200,6 +208,7 @@ async def plotCommandsHandler(ctx, args, client):
             await ctx.send(embed=embed)
             return
         await unclaimHandler(ctx, args[1])
+        return
     if args[0] in ["map", "ownedplots"]:                                                # handles some town commands, and sends it to the town commands handler in case user accidentally uses plot
         await townCommandsHandler(ctx, args, client)
         return
