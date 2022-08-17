@@ -14,7 +14,7 @@ from tbLib.identifier import identify, getFullName
 from tbLib.plots import makePlot, calculateNextPlot
 from tbLib.tbutils import warnUser, isNumInLimits
 
-townCost = 25000                                                                            # cost to make a town
+townCost = 50000                                                                            # cost to make a town
 plainText = "PLAIN"                                                                         # texts for JSON values, done to avoid typing mistakes
 mineTest = "MINE"
 forestText = "FOREST"

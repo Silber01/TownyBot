@@ -177,7 +177,7 @@ async def plotCommandsHandler(ctx, args, client):
             return
         await clearHandler(ctx, args[1])
         return
-    if args[0] == "forsale":                                                            # handles marking plots for sale
+    if args[0] in ["forsale", "fs"]:                                                    # handles marking plots for sale
         if argsCount != 2:                                                              # if no plot is given, throw syntax error
             embed = makeEmbed()
             embed.description = "Invalid syntax! Syntax is `-plot forsale YX`, i.e. `-plot forsale C4`."
@@ -185,7 +185,7 @@ async def plotCommandsHandler(ctx, args, client):
             return
         await forsaleHandler(ctx, args[1])
         return
-    if args[0] == "notforsale":                                                         # handles marking a plot not for sale
+    if args[0] in ["notforsale", "nfs"]:                                                # handles marking a plot not for sale
         if argsCount != 2:                                                              # if no plot is given, throw syntax error
             embed = makeEmbed()
             embed.description = "Invalid syntax! Syntax is `-plot notforsale YX`, i.e. `-plot notforsale C4`."
