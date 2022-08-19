@@ -5,7 +5,7 @@ from discord.ext import commands  # provides the bulk of discord bot abilities
 import asyncio
 from tbLib.help import helpHandler, commandsHandler, creditsHandler
 from tbLib.stats import statsHandler, balanceHandler, levelsHandler, baltopHandler
-from tbLib.jobs import mineHandler, chopHandler, harvestHandler, catchHandler, scavengeHandler
+from tbLib.jobs import mineHandler, chopHandler, harvestHandler, catchHandler, scavengeHandler, sellHandler
 from tbLib.dicing import diceHandler, deqDiceTTLs, denyHandler, cancelHandler, acceptHandler
 from tbLib.pay import payHandler
 from tbLib.townycommands import townCommandsHandler, plotCommandsHandler
@@ -120,6 +120,11 @@ async def fish(ctx):
 @client.command()
 async def scavenge(ctx):
     await scavengeHandler(ctx, client)
+
+
+@client.command()
+async def sell(ctx, word="NONE"):
+    await sellHandler(ctx, word)
 
 
 # -------- Town ---------------

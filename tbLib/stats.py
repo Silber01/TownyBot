@@ -3,7 +3,7 @@ import os
 import discord
 import json
 from tbLib.identifier import identify, getFullName
-from tbLib.tbutils import makeEmbed
+from tbLib.tbutils import makeEmbed, formatNum
 from tbLib.jobs import calculateNextLevel
 from tbLib.playerData import *
 from tbLib.townsData import getTownName
@@ -95,7 +95,7 @@ async def baltopHandler(ctx, page):
             leaderboard.append(userStats)
         place += 1
     for user in leaderboard:                                                # adds users to the description
-        embed.description += "\n" + user[0] + ": $" + str(user[1])
+        embed.description += "\n" + user[0] + ": $" + formatNum(user[1])
 
     embed.set_footer(text="You are in position #" + str(authorPos))         # shows player's position
     embed.color = discord.Color.purple()

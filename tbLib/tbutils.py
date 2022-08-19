@@ -41,3 +41,7 @@ def isNumInLimits(number, low, high):
     if value > high:
         return "HIGH"
     return "VALID"
+
+
+def formatNum(number):
+    return "{:,}".format(int(number))
