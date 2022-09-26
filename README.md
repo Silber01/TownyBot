@@ -26,4 +26,5 @@ Towns are a major element in TownyBot, hence it being in the name. In towns, pla
     <font size="3">
         <p align="center">If you have any questions, suggestions, bug reports, or other concers, <a href=https://forms.gle/dvV9x9AvxAq9MdZdA>please fill out this form.</a></p>
     </font>
+    <p align="center">Created by Daniel Slade</p>
 </p>
